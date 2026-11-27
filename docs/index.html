@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>⌘ Secret Keys — hotkeys & macros for every website</title>
+<meta name="description" content="Custom hotkeys, macros and a command palette for any website, in a liquid glass UI. Made by Vedant.">
+<style>
+  :root { --accent: #0A84FF; --macro: #FF9F0A; --text: #f6f8fc; --sub: rgba(240,244,255,.66); }
+  * { box-sizing: border-box; margin: 0; }
+  html { color-scheme: dark; }
+  body {
+    min-height: 100vh; color: var(--text); overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+    background: #07080d;
+  }
+  .aurora { position: fixed; inset: -20%; z-index: -1; filter: blur(60px) saturate(140%); opacity: .9; }
+  .aurora i { position: absolute; border-radius: 50%; animation: drift 18s ease-in-out infinite alternate; }
+  .aurora i:nth-child(1) { width: 55vw; height: 55vw; left: 5%; top: 0; background: radial-gradient(circle, #0A84FF, transparent 65%); }
+  .aurora i:nth-child(2) { width: 50vw; height: 50vw; right: 0; top: 10%; background: radial-gradient(circle, #FF9F0A, transparent 65%); animation-delay: -6s; }
+  .aurora i:nth-child(3) { width: 60vw; height: 60vw; left: 25%; bottom: -10%; background: radial-gradient(circle, #BF5AF2, transparent 65%); animation-delay: -12s; }
+  @keyframes drift { to { transform: translate(6vw, -4vh) scale(1.12); } }
+
+  .glass {
+    position: relative; isolation: isolate;
+    background: rgba(255,255,255,.06);
+    backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-radius: 28px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.35), inset 0 0 0 .5px rgba(255,255,255,.18), 0 30px 80px rgba(0,0,0,.45);
+  }
+  .glass::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+    background: linear-gradient(140deg, rgba(255,255,255,.55), transparent 40%, transparent 60%, rgba(255,255,255,.3));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+
+  main { max-width: 980px; margin: 0 auto; padding: 56px 20px 80px; display: flex; flex-direction: column; gap: 28px; }
+  .hero { padding: 56px 40px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .logo { width: 76px; height: 76px; border-radius: 22px; display: grid; place-items: center; font-size: 40px; font-weight: 800;
+    background: linear-gradient(145deg, var(--accent), var(--macro)); box-shadow: 0 14px 40px rgba(10,132,255,.45), inset 0 1px 0 rgba(255,255,255,.5); }
+  h1 { font-size: clamp(38px, 7vw, 64px); letter-spacing: -.035em; line-height: 1.02; }
+  .tag { font-size: clamp(16px, 2.2vw, 20px); color: var(--sub); max-width: 560px; line-height: 1.45; }
+
+  .install { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 10px; }
+  .bm {
+    display: inline-flex; align-items: center; gap: 12px; padding: 18px 30px; border-radius: 999px; cursor: grab;
+    font-size: 20px; font-weight: 700; color: #fff; text-decoration: none; user-select: none;
+    background: linear-gradient(180deg, #3aa0ff, var(--accent));
+    box-shadow: 0 12px 34px rgba(10,132,255,.55), inset 0 1px 0 rgba(255,255,255,.45);
+    animation: bob 2.6s ease-in-out infinite;
+  }
+  .bm:active { cursor: grabbing; }
+  @keyframes bob { 50% { transform: translateY(-4px); } }
+  .arrow { font-size: 14px; color: var(--sub); display: flex; align-items: center; gap: 8px; }
+  .arrow b { color: var(--text); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .btn { border: 0; cursor: pointer; padding: 12px 20px; border-radius: 999px; font: 600 15px inherit; font-family: inherit; color: var(--text);
+    background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.2); text-decoration: none; transition: transform .2s, background .2s; }
+  .btn:hover { background: rgba(255,255,255,.2); }
+  .btn:active { transform: scale(.96); }
+  .btn.orange { background: linear-gradient(180deg, #ffb340, var(--macro)); color: #1a1000; box-shadow: 0 10px 26px rgba(255,159,10,.4), inset 0 1px 0 rgba(255,255,255,.5); }
+
+  h2 { font-size: 24px; letter-spacing: -.02em; margin-bottom: 18px; }
+  .card { padding: 30px; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .step { padding: 18px; border-radius: 18px; background: rgba(255,255,255,.06); }
+  .step b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); margin-bottom: 10px; }
+  .step p, .feat p, li { color: var(--sub); line-height: 1.5; font-size: 15px; }
+  .step h3, .feat h3 { font-size: 16px; margin-bottom: 4px; }
+  kbd { font: 600 13px ui-monospace, Menlo, Consolas, monospace; padding: 2px 7px; border-radius: 6px; background: rgba(10,132,255,.2); color: #7cc0ff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .feat { padding: 18px; border-radius: 18px; background: rgba(255,255,255,.06); }
+  .feat .ico { font-size: 26px; margin-bottom: 8px; }
+  ul { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+  details { padding: 14px 0; border-top: .5px solid rgba(255,255,255,.12); }
+  summary { cursor: pointer; font-weight: 600; }
+  details p { color: var(--sub); margin-top: 8px; line-height: 1.5; }
+  footer { text-align: center; color: var(--sub); font-size: 14px; }
+  footer b { color: var(--accent); }
+  .note { font-size: 13px; color: var(--sub); }
+</style>
+</head>
+<body>
+<div class="aurora"><i></i><i></i><i></i></div>
+
+<main>
+  <section class="glass hero">
+    <div class="logo">⌘</div>
+    <h1>Secret Keys</h1>
+    <p class="tag">Custom hotkeys, macros and a command palette for any website — in a liquid glass UI. No install, no extensions.</p>
+
+    <div class="install">
+      <a class="bm" id="bm" href="#" title="Drag me to your bookmarks bar">⌘ Secret Keys</a>
+      <div class="arrow">⬆ <b>Drag this button to your bookmarks bar</b> — then click it on any website</div>
+      <div class="row">
+        <button class="btn orange" id="try">✨ Try it on this page</button>
+        <button class="btn" id="copy">📋 Copy bookmark code (phones)</button>
+        <a class="btn" href="secret-keys-extension.zip" download>⬇ Extension zip (advanced)</a>
+      </div>
+      <p class="note">Don't see a bookmarks bar? Press <kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>B</kbd> (Mac: <kbd>⌘</kbd> <kbd>Shift</kbd> <kbd>B</kbd>).</p>
+    </div>
+  </section>
+
+  <section class="glass card">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step"><b>1</b><h3>Drag once</h3><p>Drag the blue button into your bookmarks bar. That's the whole install.</p></div>
+      <div class="step"><b>2</b><h3>Click on any site</h3><p>Click the bookmark and the glass panel appears. Click again to hide it.</p></div>
+      <div class="step"><b>3</b><h3>Bind & automate</h3><p>Pick any button and give it a key, or make macros. Open the palette with <kbd>Ctrl</kbd>+<kbd>K</kbd>.</p></div>
+    </div>
+  </section>
+
+  <section class="glass card">
+    <h2>What's inside</h2>
+    <div class="grid">
+      <div class="feat"><div class="ico">⌨️</div><h3>Hotkeys for any button</h3><p>Pick an element, press a key. Smart matching keeps working when sites change.</p></div>
+      <div class="feat"><div class="ico">⚡</div><h3>Macros</h3><p>Insert text, open links, click, copy, scroll, run JS, or chain steps together.</p></div>
+      <div class="feat"><div class="ico">🔎</div><h3>Command palette</h3><p>Search and run everything from one box with <kbd>Ctrl</kbd>+<kbd>K</kbd>.</p></div>
+      <div class="feat"><div class="ico">🧩</div><h3>Variables</h3><p><kbd>{{date}}</kbd> <kbd>{{selection}}</kbd> <kbd>{{clipboard}}</kbd> <kbd>{{input:Name}}</kbd> and more.</p></div>
+      <div class="feat"><div class="ico">🫧</div><h3>Liquid glass</h3><p>5 presets plus sliders for blur, tint, depth, colors, corners and motion.</p></div>
+      <div class="feat"><div class="ico">💾</div><h3>Remembers everything</h3><p>Saved in your browser and still there after reloads. Export / import backups.</p></div>
+    </div>
+  </section>
+
+  <section class="glass card">
+    <h2>Good to know</h2>
+    <details><summary>Do I have to click the bookmark on every page?</summary>
+      <p>Yes — bookmarks can't run by themselves. Click it once per page (or after a reload) and all your saved shortcuts and macros come back instantly. For fully automatic, use the extension zip.</p></details>
+    <details><summary>Why doesn't it open on some sites?</summary>
+      <p>A few sites (like GitHub, Gmail or X) block outside scripts for security. Those need the extension version.</p></details>
+    <details><summary>Are my shortcuts shared between sites?</summary>
+      <p>Each website keeps its own saved data. Use Export on one site and Import on another to copy macros across.</p></details>
+    <details><summary>Does it work on my phone?</summary>
+      <p>Mostly yes. Tap “Copy bookmark code”, bookmark any page, then edit that bookmark: name it <b>Secret Keys</b> and paste the code as its address. In Chrome for Android, type “Secret Keys” in the address bar and tap the bookmark to run it. In Safari on iPhone, open it from your bookmarks.</p></details>
+    <details><summary>Is it private?</summary>
+      <p>Yes. Everything stays in your own browser. Nothing is sent anywhere.</p></details>
+  </section>
+
+  <footer>Made with ⌘ by <b>VEDANT</b></footer>
+</main>
+
+<script>
+  // Point the bookmark at this site's copy of secret-keys.js (works for any GitHub username)
+  const src = new URL('secret-keys.js', location.href).href;
+  const code = "(()=>{if(window.__SK_BM__)return window.__SK_BM__();try{var s=document.createElement('script');s.src='" + src + "?v='+Date.now();s.onerror=function(){alert('Secret Keys: this site blocks outside scripts. Use the extension version here.')};document.documentElement.appendChild(s)}catch(e){alert('Secret Keys: this site blocks outside scripts. Use the extension version here.')}})()";
+  const bm = document.getElementById('bm');
+  bm.href = 'javascript:' + code;
+  bm.addEventListener('click', e => { e.preventDefault(); alertBox(); });
+  function alertBox() {
+    bm.textContent = '⬆ Drag me, don\'t click';
+    setTimeout(() => (bm.textContent = '⌘ Secret Keys'), 1800);
+  }
+  document.getElementById('copy').addEventListener('click', async e => {
+    try { await navigator.clipboard.writeText('javascript:' + code); e.target.textContent = '✓ Copied'; }
+    catch { prompt('Copy this:', 'javascript:' + code); }
+  });
+  document.getElementById('try').addEventListener('click', () => (0, eval)(code));
+</script>
+</body>
+</html>
