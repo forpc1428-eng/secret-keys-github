@@ -82,7 +82,7 @@
 
     document.documentElement.append(host, liquidFilter());
     setInterval(() => {
-      if (!host.isConnected && SK.alive()) document.documentElement.append(host);
+      if (!host.isConnected && SK.alive() && document.querySelectorAll('#secret-keys-host').length === 0) document.documentElement.append(host);
     }, 2000);
 
     document.addEventListener(
@@ -120,6 +120,7 @@
     const tabs = [
       ['shortcuts', 'Shortcuts'],
       ['macros', 'Macros'],
+      ['page', 'Page'],
       ['style', 'Style']
     ];
     this.segBtns = tabs.map(([id, label]) => h('button', { dataset: { v: id }, onclick: () => this.setView(id) }, label));
@@ -265,7 +266,7 @@
   ui.renderView = function (animate) {
     if (!this.body) return;
     const st = this.body.scrollTop;
-    const build = { shortcuts: this.viewShortcuts, macros: this.viewMacros, style: this.viewStyle }[this.view];
+    const build = { shortcuts: this.viewShortcuts, macros: this.viewMacros, page: this.viewPage, style: this.viewStyle }[this.view];
     this.body.replaceChildren(h('div', { class: 'sk-view' + (animate ? ' anim' : '') }, build.call(this)));
     if (!animate) this.body.scrollTop = st;
   };
@@ -464,6 +465,136 @@
     );
   };
 
+  // ---------- Page tab: every link, button and field on this page ----------
+  ui.pageFilter = 'all';
+  ui.pageSearch = '';
+
+  ui.viewPage = function () {
+    const s = SK.store.data.settings;
+    const visible = SK.pageItems().map(el => {
+      const kind = SK.kindOf(el);
+      return { el, kind, label: SK.labelOf(el), url: kind === 'link' ? el.href : '' };
+    });
+    const hidden = SK.hiddenLinks(new Set(visible.filter(x => x.url).map(x => x.url)));
+    const all = [...visible, ...hidden];
+    const count = k => all.filter(x => x.kind === k).length;
+    const filters = [
+      ['all', 'All', all.length],
+      ['link', 'Links', count('link')],
+      ['hidden', 'Hidden', hidden.length],
+      ['button', 'Buttons', count('button')],
+      ['input', 'Fields', count('input')]
+    ];
+
+    const list = h('div', { class: 'sk-card' });
+    const more = h('div', { class: 'sk-hint', style: { textAlign: 'center' } });
+    const chipsBox = h('div', { class: 'sk-filters' });
+
+    const renderChips = () =>
+      chipsBox.replaceChildren(
+        ...filters.map(([id, label, n]) =>
+          h(
+            'button',
+            {
+              class: 'sk-filter' + (this.pageFilter === id ? ' active' : '') + (id === 'hidden' ? ' ghost' : ''),
+              onclick: () => {
+                this.pageFilter = id;
+                renderChips();
+                renderList();
+              }
+            },
+            label,
+            h('span', null, String(n))
+          )
+        )
+      );
+
+    const go = x => {
+      if (x.hidden) return SK.reveal(x);
+      x.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      setTimeout(() => {
+        this.flash(x.el);
+        this.highlight(x.el, x.label);
+        setTimeout(() => this.highlight(null), 1200);
+      }, 350);
+    };
+    const openUrl = url => SK.bg({ type: 'openUrl', url, newTab: true }).catch(() => window.open(url, '_blank', 'noopener'));
+    const icon = (title, glyph, fn) => h('button', { class: 'sk-x', title, style: { fontSize: '13px' }, onclick: fn }, glyph);
+
+    const renderList = () => {
+      const q = this.pageSearch.toLowerCase().trim();
+      const f = this.pageFilter;
+      const rows = all.filter(x => (f === 'all' || (f === 'hidden' ? x.hidden : x.kind === f)) && (!q || x.label.toLowerCase().includes(q) || x.url.toLowerCase().includes(q)));
+      const shown = rows.slice(0, 300);
+      more.textContent = rows.length > shown.length ? `Showing ${shown.length} of ${rows.length} — search to narrow it down` : '';
+      list.replaceChildren(
+        ...(shown.length
+          ? shown.map(x =>
+              h(
+                'div',
+                {
+                  class: 'sk-row click',
+                  title: x.hidden ? 'Try to show it on the page' : 'Show me where it is',
+                  onmouseenter: () => !x.hidden && this.highlight(x.el, x.label),
+                  onmouseleave: () => this.highlight(null),
+                  onclick: e => {
+                    if (!e.target.closest('.sk-x')) go(x);
+                  }
+                },
+                h('span', { class: 'sk-kind ' + x.kind + (x.hidden ? ' ghost' : '') }, x.hidden ? '👻' : SK.KIND_ICON[x.kind]),
+                h(
+                  'div',
+                  { class: 'grow' },
+                  h('div', { class: 'name' }, x.label),
+                  h('div', { class: 'meta' }, x.hidden ? h('span', { class: 'sk-src' }, SK.SOURCE_TEXT[x.source](x)) : null, x.url || x.el.tagName.toLowerCase())
+                ),
+                x.kind === 'link'
+                  ? [icon('Copy link', '⧉', async () => (await SK.copy(x.url), this.toast('Link copied'))), icon('Open in new tab', '↗', () => openUrl(x.url))]
+                  : icon(x.kind === 'input' ? 'Focus it' : 'Click it', '▶', () => (this.flash(x.el), x.kind === 'input' ? x.el.focus() : x.el.click())),
+                x.hidden ? icon('Show it on the page', '👁', () => SK.reveal(x)) : icon('Give it a hotkey', '⌨', () => this.openBindDialog(x.el))
+              )
+            )
+          : [empty(f === 'hidden' ? '👻' : '🔍', f === 'hidden' ? 'No hidden links yet. Tap “Find hidden links” to open every menu and look inside.' : 'Nothing matches')])
+      );
+    };
+    renderChips();
+    renderList();
+
+    return [
+      h(
+        'div',
+        { class: 'sk-btns' },
+        h('button', { class: 'sk-btn primary', onclick: () => (this.close(), setTimeout(() => SK.hints.start(), 150)) }, '👁  Show all on screen'),
+        h(
+          'button',
+          {
+            class: 'sk-btn',
+            onclick: async () => {
+              const links = SK.allLinks();
+              await SK.copy(links.join('\n'));
+              this.toast(`Copied ${links.length} links (including hidden)`);
+            }
+          },
+          '📚  Copy all links'
+        )
+      ),
+      h('button', { class: 'sk-btn macro block', onclick: () => SK.explore.confirmAndRun() }, '🔍  Find hidden links (opens every menu)'),
+      h('div', { class: 'sk-hint', style: { textAlign: 'center' } }, `Tip: ${SK.combo.format(s.hintKey)} tags every button & link on screen · links that appear after you click something are caught automatically`),
+      chipsBox,
+      h('input', {
+        class: 'sk-input',
+        placeholder: 'Search text or URL…',
+        value: this.pageSearch,
+        oninput: e => {
+          this.pageSearch = e.target.value;
+          renderList();
+        }
+      }),
+      list,
+      more
+    ];
+  };
+
   // ---------- Style tab ----------
   ui.viewStyle = function () {
     const s = SK.store.data.settings;
@@ -581,6 +712,15 @@
           'Hotkeys with Ctrl/Alt/Cmd still work in text boxes'
         ),
         h('div', { class: 'sk-row', style: { flexDirection: 'column', alignItems: 'stretch' } }, h('div', { class: 'name' }, 'Command palette hotkey (in page)'), cap),
+        ...[['hintKey', 'Show all buttons & links'], ['hintNewTabKey', 'Show links → open in new tab']].map(([k, label]) => {
+          const c = this.keyCapture(s[k], v => {
+            if (!v) return;
+            s[k] = v;
+            SK.store.save('settings');
+          });
+          c.style.minHeight = '44px';
+          return h('div', { class: 'sk-row', style: { flexDirection: 'column', alignItems: 'stretch' } }, h('div', { class: 'name' }, label), c);
+        }),
         h(
           'div',
           { class: 'sk-row' },
@@ -709,7 +849,9 @@
     const out = [];
     for (const b of SK.store.data.bindings) if (b.id !== exceptId && b.domain === host && SK.combo.same(b, c)) out.push(`shortcut “${b.name}”`);
     for (const m of SK.store.data.macros) if (m.id !== exceptId && (m.global || m.domain === host) && SK.combo.same(m, c)) out.push(`macro “${m.name}”`);
-    if (SK.combo.same(SK.store.data.settings.paletteKey, c)) out.push('the command palette');
+    const st = SK.store.data.settings;
+    if (SK.combo.same(st.paletteKey, c)) out.push('the command palette');
+    if (SK.combo.same(st.hintKey, c) || SK.combo.same(st.hintNewTabKey, c)) out.push('“show all buttons & links”');
     return out;
   };
 
@@ -1009,6 +1151,7 @@
       h('span', { class: 'bolt' }, o.type === 'error' ? '⚠' : '⚡'),
       h('span', null, msg)
     );
+    const textEl = el.lastChild;
     let timer;
     const dismiss = () => {
       clearTimeout(timer);
@@ -1031,7 +1174,7 @@
     this.toasts.append(el);
     while (this.toasts.children.length > 4) this.toasts.firstChild.remove();
     timer = setTimeout(dismiss, o.duration || 2200);
-    return { dismiss };
+    return { dismiss, set: t => (textEl.textContent = t) };
   };
 
   // ---------- backup ----------

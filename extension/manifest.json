@@ -31,6 +31,8 @@
         "content/styles.js",
         "content/ui.js",
         "content/palette.js",
+        "content/hints.js",
+        "content/explore.js",
         "content/main.js"
       ],
       "run_at": "document_idle"

@@ -1,8 +1,8 @@
-/*! ⌘ Secret Keys v10.0.0 — bookmarklet build — made by VEDANT */
+/*! \u2318 Secret Keys v10.0.0 \u2014 bookmarklet build \u2014 made by VEDANT */
 (function () {
 'use strict';
 if (window.__SK_BM__) { window.__SK_BM__(); return; }
-// Secret Keys — bookmarklet adapter.
+// Secret Keys \u2014 bookmarklet adapter.
 // Gives the extension code a fake `chrome` object so the exact same files run from a plain <script>.
 // Data lives in this site's localStorage (each site keeps its own; use Export/Import to move it).
 const chrome = (() => {
@@ -107,7 +107,7 @@ const chrome = (() => {
 
 
 // ===== content/dom.js =====
-// Secret Keys v10 — DOM + key helpers
+// Secret Keys v10 \u2014 DOM + key helpers
 // Every content file is wrapped in an IIFE and shares one namespace: globalThis.SK
 (() => {
   'use strict';
@@ -116,7 +116,7 @@ const chrome = (() => {
   SK.isMac = /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent);
   SK.MOD_KEYS = ['Control', 'Alt', 'Shift', 'Meta', 'AltGraph', 'CapsLock', 'Fn'];
 
-  // Tiny element builder — no innerHTML anywhere (safe on Trusted-Types sites, no injection bugs)
+  // Tiny element builder \u2014 no innerHTML anywhere (safe on Trusted-Types sites, no injection bugs)
   const PROPS = new Set(['value', 'checked', 'textContent', 'title', 'placeholder', 'type', 'disabled', 'min', 'max', 'step', 'htmlFor', 'tabIndex', 'spellcheck', 'rows']);
   SK.h = function h(tag, props, ...kids) {
     const el = document.createElement(tag);
@@ -159,7 +159,7 @@ const chrome = (() => {
 
   SK.bg = msg =>
     new Promise((resolve, reject) => {
-      if (!SK.alive()) return reject(new Error('Extension was updated — reload this page'));
+      if (!SK.alive()) return reject(new Error('Extension was updated \u2014 reload this page'));
       chrome.runtime.sendMessage(msg, res => {
         const err = chrome.runtime.lastError;
         if (err) return reject(new Error(err.message));
@@ -169,9 +169,9 @@ const chrome = (() => {
     });
 
   // ---------- Keys ----------
-  const NAMES = { ' ': 'Space', arrowup: '↑', arrowdown: '↓', arrowleft: '←', arrowright: '→', escape: 'Esc', backspace: '⌫', delete: 'Del', enter: '↵', tab: 'Tab', pageup: 'PgUp', pagedown: 'PgDn' };
+  const NAMES = { ' ': 'Space', arrowup: '\u2191', arrowdown: '\u2193', arrowleft: '\u2190', arrowright: '\u2192', escape: 'Esc', backspace: '\u232b', delete: 'Del', enter: '\u21b5', tab: 'Tab', pageup: 'PgUp', pagedown: 'PgDn' };
 
-  // Use the physical key for letters/digits so Alt/Option combos work on Mac (Option+K gives "˚")
+  // Use the physical key for letters/digits so Alt/Option combos work on Mac (Option+K gives "\u02da")
   const keyOf = e => {
     const c = e.code || '';
     if (c.startsWith('Key')) return c.slice(3).toLowerCase();
@@ -193,10 +193,10 @@ const chrome = (() => {
     parts(c) {
       if (!c || !c.key) return [];
       const p = [];
-      if (c.ctrl) p.push(SK.isMac ? '⌃' : 'Ctrl');
-      if (c.alt) p.push(SK.isMac ? '⌥' : 'Alt');
-      if (c.shift) p.push(SK.isMac ? '⇧' : 'Shift');
-      if (c.meta) p.push(SK.isMac ? '⌘' : 'Win');
+      if (c.ctrl) p.push(SK.isMac ? '\u2303' : 'Ctrl');
+      if (c.alt) p.push(SK.isMac ? '\u2325' : 'Alt');
+      if (c.shift) p.push(SK.isMac ? '\u21e7' : 'Shift');
+      if (c.meta) p.push(SK.isMac ? '\u2318' : 'Win');
       const k = c.key;
       p.push(NAMES[k] || (k.length === 1 ? k.toUpperCase() : k[0].toUpperCase() + k.slice(1)));
       return p;
@@ -232,7 +232,7 @@ const chrome = (() => {
   };
 
   SK.labelOf = el => {
-    const raw = el.getAttribute('aria-label') || el.innerText || el.title || el.value || el.getAttribute('alt') || el.placeholder || el.getAttribute('name') || '';
+    const raw = el.getAttribute('aria-label') || el.innerText || el.textContent || el.title || el.value || el.getAttribute('alt') || el.placeholder || el.getAttribute('name') || '';
     const t = String(raw).replace(/\s+/g, ' ').trim();
     return (t || `<${el.tagName.toLowerCase()}>`).slice(0, 48);
   };
@@ -338,7 +338,7 @@ const chrome = (() => {
 globalThis.SK.MODE = 'bookmarklet';
 
 // ===== content/store.js =====
-// Secret Keys v10 — storage (chrome.storage = survives reloads, shared across every site, live-syncs between tabs)
+// Secret Keys v10 \u2014 storage (chrome.storage = survives reloads, shared across every site, live-syncs between tabs)
 (() => {
   'use strict';
   const SK = globalThis.SK;
@@ -355,6 +355,8 @@ globalThis.SK.MODE = 'bookmarklet';
     enabled: true,
     ignoreInInputs: true,
     paletteKey: { key: 'k', ctrl: !SK.isMac, meta: SK.isMac, alt: false, shift: false },
+    hintKey: { key: 'j', alt: true, ctrl: false, meta: false, shift: false },
+    hintNewTabKey: { key: 'j', alt: true, shift: true, ctrl: false, meta: false },
     theme: {
       preset: 'ios',
       ...SK.PRESETS.ios,
@@ -369,13 +371,13 @@ globalThis.SK.MODE = 'bookmarklet';
   };
   delete SK.DEFAULT_SETTINGS.theme.label;
 
-  // Settings UI is generated from this list — add a row here and a control appears.
+  // Settings UI is generated from this list \u2014 add a row here and a control appears.
   SK.THEME_SCHEMA = [
     { group: 'Glass' },
     { key: 'opacity', label: 'Tint strength', type: 'range', min: 0, max: 0.7, step: 0.01, fmt: v => Math.round((1 - v) * 100) + '% clear' },
     { key: 'blur', label: 'Blur', type: 'range', min: 0, max: 60, step: 1, fmt: v => v + 'px' },
     { key: 'saturate', label: 'Vibrancy', type: 'range', min: 100, max: 300, step: 5, fmt: v => v + '%' },
-    { key: 'dim', label: 'Backdrop dim', type: 'range', min: -40, max: 40, step: 1, fmt: v => (v > 0 ? '−' : '+') + Math.abs(v) + '%' },
+    { key: 'dim', label: 'Backdrop dim', type: 'range', min: -40, max: 40, step: 1, fmt: v => (v > 0 ? '\u2212' : '+') + Math.abs(v) + '%' },
     { key: 'border', label: 'Edge light', type: 'range', min: 0, max: 0.6, step: 0.01, fmt: v => Math.round(v * 100) + '%' },
     { key: 'shadow', label: 'Depth', type: 'range', min: 0, max: 1, step: 0.01, fmt: v => Math.round(v * 100) + '%' },
     { key: 'radius', label: 'Corner radius', type: 'range', min: 0, max: 40, step: 1, fmt: v => v + 'px' },
@@ -386,7 +388,7 @@ globalThis.SK.MODE = 'bookmarklet';
     { key: 'fontSize', label: 'Text size', type: 'range', min: 11, max: 17, step: 1, fmt: v => v + 'px' },
     { key: 'textGlow', label: 'Text shadow (readability)', type: 'toggle' },
     { group: 'Motion & effects' },
-    { key: 'speed', label: 'Animation speed', type: 'range', min: 0.25, max: 2.5, step: 0.05, fmt: v => (+v).toFixed(2) + '×' },
+    { key: 'speed', label: 'Animation speed', type: 'range', min: 0.25, max: 2.5, step: 0.05, fmt: v => (+v).toFixed(2) + '\u00d7' },
     { key: 'specular', label: 'Light follows cursor', type: 'toggle' },
     { key: 'liquid', label: 'Liquid refraction (experimental)', type: 'toggle' }
   ];
@@ -522,7 +524,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
 
 // ===== content/actions.js =====
-// Secret Keys v10 — macro actions
+// Secret Keys v10 \u2014 macro actions
 (() => {
   'use strict';
   const SK = globalThis.SK;
@@ -560,7 +562,7 @@ globalThis.SK.MODE = 'bookmarklet';
     return out;
   };
 
-  // Works with plain inputs, React/Vue inputs and rich editors (Gmail, Notion, Slack…) and keeps Ctrl+Z
+  // Works with plain inputs, React/Vue inputs and rich editors (Gmail, Notion, Slack\u2026) and keeps Ctrl+Z
   SK.insertText = (el, text, mode = 'cursor') => {
     if (!el || !SK.isTextField(el)) return false;
     el.focus();
@@ -626,7 +628,7 @@ globalThis.SK.MODE = 'bookmarklet';
   SK.ACTIONS = {
     insert_text: {
       label: 'Insert text',
-      icon: '📝',
+      icon: '\ud83d\udcdd',
       desc: 'Type saved text into the box you are in',
       fields: [
         { key: 'text', label: 'Text', type: 'textarea', placeholder: 'Hi {{input:Name}},\n\nThanks for reaching out!', hint: VAR_HINT },
@@ -643,8 +645,8 @@ globalThis.SK.MODE = 'bookmarklet';
 
     open_url: {
       label: 'Open URL',
-      icon: '🌐',
-      desc: 'Open a link — use {{selection}} to search what you highlighted',
+      icon: '\ud83c\udf10',
+      desc: 'Open a link \u2014 use {{selection}} to search what you highlighted',
       fields: [
         { key: 'url', label: 'URL', type: 'text', placeholder: 'https://www.google.com/search?q={{selection}}' },
         { key: 'newTab', label: 'Open in new tab', type: 'checkbox', default: true }
@@ -660,7 +662,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     click_element: {
       label: 'Click element',
-      icon: '🖱️',
+      icon: '\ud83d\uddb1\ufe0f',
       desc: 'Click something on the page by CSS selector (waits for it to appear)',
       fields: [
         { key: 'selector', label: 'CSS selector', type: 'text', placeholder: '#submit, button[aria-label="Send"]', pick: true },
@@ -676,7 +678,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     focus_element: {
       label: 'Focus element',
-      icon: '🎯',
+      icon: '\ud83c\udfaf',
       desc: 'Jump the cursor into a search box or field',
       fields: [{ key: 'selector', label: 'CSS selector', type: 'text', placeholder: 'input[type=search]', pick: true }],
       async run(p) {
@@ -690,7 +692,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     copy_text: {
       label: 'Copy to clipboard',
-      icon: '📋',
+      icon: '\ud83d\udccb',
       desc: 'Copy saved text (variables work here too)',
       fields: [{ key: 'text', label: 'Text', type: 'textarea', placeholder: '[{{title}}]({{url}})', hint: VAR_HINT }],
       async run(p) {
@@ -701,7 +703,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     scroll_page: {
       label: 'Scroll page',
-      icon: '📜',
+      icon: '\ud83d\udcdc',
       desc: 'Scroll to top, bottom, a position or by one screen',
       fields: [
         { key: 'position', label: 'Scroll to', type: 'select', options: ['Top', 'Bottom', 'Up one screen', 'Down one screen', 'Custom'] },
@@ -718,7 +720,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     tab_action: {
       label: 'Tab action',
-      icon: '🗂️',
+      icon: '\ud83d\uddc2\ufe0f',
       desc: 'Control browser tabs and bookmarks',
       fields: [
         {
@@ -739,7 +741,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     run_js: {
       label: 'Run JavaScript',
-      icon: '⚙️',
+      icon: '\u2699\ufe0f',
       desc: 'Run your own code on the page',
       fields: [{ key: 'code', label: 'JavaScript', type: 'textarea', mono: true, placeholder: 'document.querySelectorAll("video").forEach(v => v.playbackRate = 2)' }],
       async run(p) {
@@ -749,10 +751,10 @@ globalThis.SK.MODE = 'bookmarklet';
 
     notify: {
       label: 'Show notification',
-      icon: '🔔',
+      icon: '\ud83d\udd14',
       desc: 'Show a glass toast message',
       fields: [
-        { key: 'message', label: 'Message', type: 'text', placeholder: 'Stand up and stretch 🧘' },
+        { key: 'message', label: 'Message', type: 'text', placeholder: 'Stand up and stretch \ud83e\uddd8' },
         { key: 'duration', label: 'Duration (ms)', type: 'number', placeholder: '3000' }
       ],
       async run(p) {
@@ -763,7 +765,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     multi_action: {
       label: 'Multi-step chain',
-      icon: '🔗',
+      icon: '\ud83d\udd17',
       desc: 'Run steps in order. Extra steps: {"type":"wait","ms":500} and {"type":"wait_for","selector":"#x"}',
       fields: [
         {
@@ -812,7 +814,7 @@ globalThis.SK.MODE = 'bookmarklet';
     if (!def) return SK.ui.toast(`Unknown action "${m.actionType}"`, { type: 'error' });
     try {
       const res = await def.run(m.params || {}, ctx);
-      if (res) SK.ui.toast(`${m.name} · ${res}`, { accent: 'macro', duration: 1800 });
+      if (res) SK.ui.toast(`${m.name} \u00b7 ${res}`, { accent: 'macro', duration: 1800 });
     } catch (e) {
       if (e.message !== 'Cancelled') SK.ui.toast(`${m.name}: ${e.message}`, { type: 'error', duration: 4500 });
     }
@@ -821,7 +823,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
 
 // ===== content/styles.js =====
-// Secret Keys v10 — liquid glass styles (lives inside a Shadow DOM so no website can break it)
+// Secret Keys v10 \u2014 liquid glass styles (lives inside a Shadow DOM so no website can break it)
 (() => {
   'use strict';
   const SK = globalThis.SK;
@@ -860,7 +862,7 @@ globalThis.SK.MODE = 'bookmarklet';
 .liquid .glass.sk-panel, .liquid .glass.sk-sheet {
   backdrop-filter: url(#sk-liquid) blur(var(--sk-blur)) saturate(var(--sk-sat)) brightness(var(--sk-bright));
 }
-/* Gradient rim — light catching the edge */
+/* Gradient rim \u2014 light catching the edge */
 .glass::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none; z-index: 3;
   background: linear-gradient(140deg,
@@ -1011,6 +1013,37 @@ globalThis.SK.MODE = 'bookmarklet';
   background: radial-gradient(circle at 70% 70%, var(--sk-text) 1.2px, transparent 1.6px), radial-gradient(circle at 30% 70%, var(--sk-text) 1.2px, transparent 1.6px), radial-gradient(circle at 70% 30%, var(--sk-text) 1.2px, transparent 1.6px); }
 .dock-left .sk-resize, .dock-right .sk-resize { display: none; }
 
+/* ---------- Page tab ---------- */
+.sk-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.sk-filter { border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-weight: 600; font-size: .88em; background: var(--sk-fill); color: var(--sk-sub); transition: transform .2s ${EASE}, background .15s; }
+.sk-filter span { font-size: .85em; padding: 0 6px; border-radius: 10px; background: var(--sk-fill2); }
+.sk-filter.active { background: var(--sk-accent); color: #fff; text-shadow: none; }
+.sk-filter.active span { background: rgba(255,255,255,.25); }
+.sk-filter:active { transform: scale(.94); }
+.sk-kind { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: 13px; flex-shrink: 0; text-shadow: none; background: var(--sk-fill); }
+.sk-kind.link { background: color-mix(in srgb, var(--sk-accent) 22%, transparent); }
+.sk-kind.button { background: color-mix(in srgb, var(--sk-macro) 22%, transparent); }
+.sk-kind.input { background: rgba(48,209,88,.2); }
+.sk-kind.ghost { background: transparent; outline: 1.5px dashed color-mix(in srgb, var(--sk-accent) 60%, transparent); outline-offset: -1.5px; }
+.sk-filter.ghost:not(.active) { outline: 1px dashed var(--sk-line); outline-offset: -1px; }
+.sk-src { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 6px; font-weight: 600; color: var(--sk-macro); background: color-mix(in srgb, var(--sk-macro) 16%, transparent); }
+
+/* ---------- Hint tags (show all buttons & links) ---------- */
+.sk-hints { position: fixed; inset: 0; z-index: 2147483646; pointer-events: none; }
+.sk-hints.out { transition: opacity .15s; opacity: 0; }
+.sk-tag { position: fixed; pointer-events: auto; cursor: pointer; transform: translate(-6px, -8px);
+  font: 800 11.5px/1.25 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .05em; padding: 3px 7px; border-radius: 8px;
+  color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.35);
+  background: var(--hc); backdrop-filter: blur(8px) saturate(180%); -webkit-backdrop-filter: blur(8px) saturate(180%);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5), 0 0 0 .5px rgba(255,255,255,.45);
+  animation: sk-hint-in .32s ${EASE} both; }
+.sk-tag:hover { filter: brightness(1.15); z-index: 1; }
+.sk-tag b { opacity: .4; font-weight: 800; }
+.sk-tag.link { --hc: color-mix(in srgb, var(--sk-accent) 88%, transparent); }
+.sk-tag.button { --hc: color-mix(in srgb, var(--sk-macro) 90%, transparent); }
+.sk-tag.input { --hc: rgba(40,190,80,.9); }
+@keyframes sk-hint-in { from { opacity: 0; transform: translate(-6px, -8px) scale(.4); } }
+
 /* ---------- Floating pill ---------- */
 .sk-badge { position: fixed; z-index: 2147483645; display: flex; align-items: center; gap: 8px; padding: 9px 14px 9px 10px; border-radius: 999px !important; cursor: pointer; user-select: none; touch-action: none; font-weight: 700; font-size: .92em;
   transition: transform .35s ${EASE}, opacity .3s; }
@@ -1084,7 +1117,7 @@ globalThis.SK.MODE = 'bookmarklet';
 }
 `;
 
-  // Theme → CSS variables on the host (instant, no re-render)
+  // Theme \u2192 CSS variables on the host (instant, no re-render)
   SK.themeVars = t => {
     const light = t.tint === 'light';
     const rgb = light ? '255,255,255' : '16,18,26';
@@ -1115,7 +1148,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
 
 // ===== content/ui.js =====
-// Secret Keys v10 — the glass interface
+// Secret Keys v10 \u2014 the glass interface
 (() => {
   'use strict';
   const SK = globalThis.SK;
@@ -1141,7 +1174,7 @@ globalThis.SK.MODE = 'bookmarklet';
   // ---------- small building blocks ----------
   ui.kbd = (c, macro) => {
     const parts = SK.combo.parts(c);
-    return h('span', { class: 'sk-kbd' + (macro ? ' macro' : '') + (parts.length ? '' : ' none') }, (parts.length ? parts : ['—']).map(p => h('span', null, p)));
+    return h('span', { class: 'sk-kbd' + (macro ? ' macro' : '') + (parts.length ? '' : ' none') }, (parts.length ? parts : ['\u2014']).map(p => h('span', null, p)));
   };
   const toggle = (checked, onChange) =>
     h('label', { class: 'sk-switch' }, h('input', { type: 'checkbox', checked: !!checked, onchange: e => onChange(e.target.checked) }), h('i'));
@@ -1199,7 +1232,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
     document.documentElement.append(host, liquidFilter());
     setInterval(() => {
-      if (!host.isConnected && SK.alive()) document.documentElement.append(host);
+      if (!host.isConnected && SK.alive() && document.querySelectorAll('#secret-keys-host').length === 0) document.documentElement.append(host);
     }, 2000);
 
     document.addEventListener(
@@ -1237,6 +1270,7 @@ globalThis.SK.MODE = 'bookmarklet';
     const tabs = [
       ['shortcuts', 'Shortcuts'],
       ['macros', 'Macros'],
+      ['page', 'Page'],
       ['style', 'Style']
     ];
     this.segBtns = tabs.map(([id, label]) => h('button', { dataset: { v: id }, onclick: () => this.setView(id) }, label));
@@ -1245,10 +1279,10 @@ globalThis.SK.MODE = 'bookmarklet';
     this.head = h(
       'div',
       { class: 'sk-head' },
-      h('div', { class: 'sk-logo' }, '⌘'),
+      h('div', { class: 'sk-logo' }, '\u2318'),
       h('div', { class: 'sk-title' }, 'Secret Keys', h('small', null, location.hostname || 'this page')),
-      h('button', { class: 'sk-icon-btn', title: 'Command palette', onclick: () => SK.palette.open() }, '⌕'),
-      h('button', { class: 'sk-icon-btn', title: 'Hide (Alt+Shift+K)', onclick: () => this.close() }, '×')
+      h('button', { class: 'sk-icon-btn', title: 'Command palette', onclick: () => SK.palette.open() }, '\u2315'),
+      h('button', { class: 'sk-icon-btn', title: 'Hide (Alt+Shift+K)', onclick: () => this.close() }, '\u00d7')
     );
     this.resizer = h('div', { class: 'sk-resize', title: 'Resize' });
     this.panel = h(
@@ -1382,7 +1416,7 @@ globalThis.SK.MODE = 'bookmarklet';
   ui.renderView = function (animate) {
     if (!this.body) return;
     const st = this.body.scrollTop;
-    const build = { shortcuts: this.viewShortcuts, macros: this.viewMacros, style: this.viewStyle }[this.view];
+    const build = { shortcuts: this.viewShortcuts, macros: this.viewMacros, page: this.viewPage, style: this.viewStyle }[this.view];
     this.body.replaceChildren(h('div', { class: 'sk-view' + (animate ? ' anim' : '') }, build.call(this)));
     if (!animate) this.body.scrollTop = st;
   };
@@ -1443,7 +1477,7 @@ globalThis.SK.MODE = 'bookmarklet';
                 h('span', { class: 'sk-chip' }, x.el.tagName.toLowerCase())
               )
             )
-          : [empty('🔍', 'Nothing found on this page')])
+          : [empty('\ud83d\udd0d', 'Nothing found on this page')])
       );
     };
     renderDisc();
@@ -1462,9 +1496,9 @@ globalThis.SK.MODE = 'bookmarklet';
           s.enabled ? 'Hotkeys and macros are on' : 'Everything is paused'
         )
       ),
-      h('button', { class: 'sk-btn primary block', onclick: () => this.startPicking() }, '🎯  Pick element from page'),
+      h('button', { class: 'sk-btn primary block', onclick: () => this.startPicking() }, '\ud83c\udfaf  Pick element from page'),
       section(`On ${host || 'this page'}`, h('span', null, String(list.length))),
-      list.length ? h('div', { class: 'sk-card' }, list.map(b => this.bindingRow(b))) : empty('⌨️', 'No shortcuts here yet. Pick an element, then press a key.'),
+      list.length ? h('div', { class: 'sk-card' }, list.map(b => this.bindingRow(b))) : empty('\u2328\ufe0f', 'No shortcuts here yet. Pick an element, then press a key.'),
       section(
         'Discover',
         h(
@@ -1482,7 +1516,7 @@ globalThis.SK.MODE = 'bookmarklet';
       ),
       h('input', {
         class: 'sk-input',
-        placeholder: 'Search buttons & links on this page…',
+        placeholder: 'Search buttons & links on this page\u2026',
         value: this.search,
         oninput: e => {
           this.search = e.target.value;
@@ -1509,9 +1543,9 @@ globalThis.SK.MODE = 'bookmarklet';
         b.enabled = v;
         SK.store.save('bindings');
       }),
-      h('div', { class: 'grow' }, h('div', { class: 'name' }, b.name), h('div', { class: 'meta' }, found ? b.selector : '⚠ Not on this page right now')),
+      h('div', { class: 'grow' }, h('div', { class: 'name' }, b.name), h('div', { class: 'meta' }, found ? b.selector : '\u26a0 Not on this page right now')),
       this.kbd(b),
-      h('button', { class: 'sk-x', title: 'Delete', onclick: () => this.removeItem('bindings', b) }, '×')
+      h('button', { class: 'sk-x', title: 'Delete', onclick: () => this.removeItem('bindings', b) }, '\u00d7')
     );
   };
 
@@ -1521,7 +1555,7 @@ globalThis.SK.MODE = 'bookmarklet';
     { name: 'Copy page as Markdown link', actionType: 'copy_text', params: { text: '[{{title}}]({{url}})' }, global: true },
     { name: "Insert today's date", actionType: 'insert_text', params: { text: '{{date}}', mode: 'cursor' }, global: true },
     { name: 'Email signature', actionType: 'insert_text', params: { text: 'Best regards,\nVedant', mode: 'cursor' }, global: true },
-    { name: 'Video speed 1× / 2×', actionType: 'run_js', params: { code: 'document.querySelectorAll("video").forEach(v => v.playbackRate = v.playbackRate >= 2 ? 1 : 2)' }, global: true },
+    { name: 'Video speed 1\u00d7 / 2\u00d7', actionType: 'run_js', params: { code: 'document.querySelectorAll("video").forEach(v => v.playbackRate = v.playbackRate >= 2 ? 1 : 2)' }, global: true },
     { name: 'Close duplicate tabs', actionType: 'tab_action', params: { action: 'dedupe' }, global: true },
     { name: 'Translate this page', actionType: 'open_url', params: { url: 'https://translate.google.com/translate?sl=auto&tl=en&u={{url}}', newTab: true }, global: true },
     { name: 'Scroll to top', actionType: 'scroll_page', params: { position: 'Top' }, global: true }
@@ -1533,9 +1567,9 @@ globalThis.SK.MODE = 'bookmarklet';
     const list = all.filter(m => m.global || m.domain === host);
     const elsewhere = all.length - list.length;
     return [
-      h('button', { class: 'sk-btn macro block', onclick: () => this.openMacroEditor() }, '＋  New macro'),
+      h('button', { class: 'sk-btn macro block', onclick: () => this.openMacroEditor() }, '\uff0b  New macro'),
       section('My macros', h('span', null, String(list.length))),
-      list.length ? h('div', { class: 'sk-card' }, list.map(m => this.macroRow(m))) : empty('⚡', 'No macros yet. Make one, or start from a template below.'),
+      list.length ? h('div', { class: 'sk-card' }, list.map(m => this.macroRow(m))) : empty('\u26a1', 'No macros yet. Make one, or start from a template below.'),
       elsewhere ? h('div', { class: 'sk-hint', style: { textAlign: 'center' } }, `+ ${elsewhere} more macro${elsewhere > 1 ? 's' : ''} that only run on other sites`) : null,
       section('Start from a template'),
       h(
@@ -1573,12 +1607,142 @@ globalThis.SK.MODE = 'bookmarklet';
         'div',
         { class: 'grow' },
         h('div', { class: 'name' }, m.name),
-        h('div', { class: 'meta' }, `${def ? def.icon + ' ' + def.label : m.actionType} · ${m.global ? '🌍 All sites' : m.domain}`)
+        h('div', { class: 'meta' }, `${def ? def.icon + ' ' + def.label : m.actionType} \u00b7 ${m.global ? '\ud83c\udf0d All sites' : m.domain}`)
       ),
       m.key ? this.kbd(m, true) : h('span', { class: 'sk-chip' }, 'Palette'),
-      h('button', { class: 'sk-x sk-run', title: 'Run now', style: { fontSize: '12px' }, onclick: () => SK.runMacro(m, { target: this.lastEditable }) }, '▶'),
-      h('button', { class: 'sk-x', title: 'Delete', onclick: () => this.removeItem('macros', m) }, '×')
+      h('button', { class: 'sk-x sk-run', title: 'Run now', style: { fontSize: '12px' }, onclick: () => SK.runMacro(m, { target: this.lastEditable }) }, '\u25b6'),
+      h('button', { class: 'sk-x', title: 'Delete', onclick: () => this.removeItem('macros', m) }, '\u00d7')
     );
+  };
+
+  // ---------- Page tab: every link, button and field on this page ----------
+  ui.pageFilter = 'all';
+  ui.pageSearch = '';
+
+  ui.viewPage = function () {
+    const s = SK.store.data.settings;
+    const visible = SK.pageItems().map(el => {
+      const kind = SK.kindOf(el);
+      return { el, kind, label: SK.labelOf(el), url: kind === 'link' ? el.href : '' };
+    });
+    const hidden = SK.hiddenLinks(new Set(visible.filter(x => x.url).map(x => x.url)));
+    const all = [...visible, ...hidden];
+    const count = k => all.filter(x => x.kind === k).length;
+    const filters = [
+      ['all', 'All', all.length],
+      ['link', 'Links', count('link')],
+      ['hidden', 'Hidden', hidden.length],
+      ['button', 'Buttons', count('button')],
+      ['input', 'Fields', count('input')]
+    ];
+
+    const list = h('div', { class: 'sk-card' });
+    const more = h('div', { class: 'sk-hint', style: { textAlign: 'center' } });
+    const chipsBox = h('div', { class: 'sk-filters' });
+
+    const renderChips = () =>
+      chipsBox.replaceChildren(
+        ...filters.map(([id, label, n]) =>
+          h(
+            'button',
+            {
+              class: 'sk-filter' + (this.pageFilter === id ? ' active' : '') + (id === 'hidden' ? ' ghost' : ''),
+              onclick: () => {
+                this.pageFilter = id;
+                renderChips();
+                renderList();
+              }
+            },
+            label,
+            h('span', null, String(n))
+          )
+        )
+      );
+
+    const go = x => {
+      if (x.hidden) return SK.reveal(x);
+      x.el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      setTimeout(() => {
+        this.flash(x.el);
+        this.highlight(x.el, x.label);
+        setTimeout(() => this.highlight(null), 1200);
+      }, 350);
+    };
+    const openUrl = url => SK.bg({ type: 'openUrl', url, newTab: true }).catch(() => window.open(url, '_blank', 'noopener'));
+    const icon = (title, glyph, fn) => h('button', { class: 'sk-x', title, style: { fontSize: '13px' }, onclick: fn }, glyph);
+
+    const renderList = () => {
+      const q = this.pageSearch.toLowerCase().trim();
+      const f = this.pageFilter;
+      const rows = all.filter(x => (f === 'all' || (f === 'hidden' ? x.hidden : x.kind === f)) && (!q || x.label.toLowerCase().includes(q) || x.url.toLowerCase().includes(q)));
+      const shown = rows.slice(0, 300);
+      more.textContent = rows.length > shown.length ? `Showing ${shown.length} of ${rows.length} \u2014 search to narrow it down` : '';
+      list.replaceChildren(
+        ...(shown.length
+          ? shown.map(x =>
+              h(
+                'div',
+                {
+                  class: 'sk-row click',
+                  title: x.hidden ? 'Try to show it on the page' : 'Show me where it is',
+                  onmouseenter: () => !x.hidden && this.highlight(x.el, x.label),
+                  onmouseleave: () => this.highlight(null),
+                  onclick: e => {
+                    if (!e.target.closest('.sk-x')) go(x);
+                  }
+                },
+                h('span', { class: 'sk-kind ' + x.kind + (x.hidden ? ' ghost' : '') }, x.hidden ? '\ud83d\udc7b' : SK.KIND_ICON[x.kind]),
+                h(
+                  'div',
+                  { class: 'grow' },
+                  h('div', { class: 'name' }, x.label),
+                  h('div', { class: 'meta' }, x.hidden ? h('span', { class: 'sk-src' }, SK.SOURCE_TEXT[x.source](x)) : null, x.url || x.el.tagName.toLowerCase())
+                ),
+                x.kind === 'link'
+                  ? [icon('Copy link', '\u29c9', async () => (await SK.copy(x.url), this.toast('Link copied'))), icon('Open in new tab', '\u2197', () => openUrl(x.url))]
+                  : icon(x.kind === 'input' ? 'Focus it' : 'Click it', '\u25b6', () => (this.flash(x.el), x.kind === 'input' ? x.el.focus() : x.el.click())),
+                x.hidden ? icon('Show it on the page', '\ud83d\udc41', () => SK.reveal(x)) : icon('Give it a hotkey', '\u2328', () => this.openBindDialog(x.el))
+              )
+            )
+          : [empty(f === 'hidden' ? '\ud83d\udc7b' : '\ud83d\udd0d', f === 'hidden' ? 'No hidden links yet. Tap \u201cFind hidden links\u201d to open every menu and look inside.' : 'Nothing matches')])
+      );
+    };
+    renderChips();
+    renderList();
+
+    return [
+      h(
+        'div',
+        { class: 'sk-btns' },
+        h('button', { class: 'sk-btn primary', onclick: () => (this.close(), setTimeout(() => SK.hints.start(), 150)) }, '\ud83d\udc41  Show all on screen'),
+        h(
+          'button',
+          {
+            class: 'sk-btn',
+            onclick: async () => {
+              const links = SK.allLinks();
+              await SK.copy(links.join('\n'));
+              this.toast(`Copied ${links.length} links (including hidden)`);
+            }
+          },
+          '\ud83d\udcda  Copy all links'
+        )
+      ),
+      h('button', { class: 'sk-btn macro block', onclick: () => SK.explore.confirmAndRun() }, '\ud83d\udd0d  Find hidden links (opens every menu)'),
+      h('div', { class: 'sk-hint', style: { textAlign: 'center' } }, `Tip: ${SK.combo.format(s.hintKey)} tags every button & link on screen \u00b7 links that appear after you click something are caught automatically`),
+      chipsBox,
+      h('input', {
+        class: 'sk-input',
+        placeholder: 'Search text or URL\u2026',
+        value: this.pageSearch,
+        oninput: e => {
+          this.pageSearch = e.target.value;
+          renderList();
+        }
+      }),
+      list,
+      more
+    ];
   };
 
   // ---------- Style tab ----------
@@ -1670,9 +1834,9 @@ globalThis.SK.MODE = 'bookmarklet';
       SK.store.save('settings');
     });
     cap.style.minHeight = '44px';
-    const jsStatus = h('div', { class: 'meta' }, 'Checking…');
+    const jsStatus = h('div', { class: 'meta' }, 'Checking\u2026');
     SK.bg({ type: 'userScriptsStatus' })
-      .then(ok => (jsStatus.textContent = ok ? '✓ Works on every site' : SK.MODE === 'bookmarklet' ? 'Works on sites that allow it (install the extension for every site)' : 'Limited on strict sites — turn on “Allow user scripts” in chrome://extensions → Secret Keys → Details'))
+      .then(ok => (jsStatus.textContent = ok ? '\u2713 Works on every site' : SK.MODE === 'bookmarklet' ? 'Works on sites that allow it (install the extension for every site)' : 'Limited on strict sites \u2014 turn on \u201cAllow user scripts\u201d in chrome://extensions \u2192 Secret Keys \u2192 Details'))
       .catch(() => (jsStatus.textContent = 'Unknown'));
 
     out.push(
@@ -1698,10 +1862,19 @@ globalThis.SK.MODE = 'bookmarklet';
           'Hotkeys with Ctrl/Alt/Cmd still work in text boxes'
         ),
         h('div', { class: 'sk-row', style: { flexDirection: 'column', alignItems: 'stretch' } }, h('div', { class: 'name' }, 'Command palette hotkey (in page)'), cap),
+        ...[['hintKey', 'Show all buttons & links'], ['hintNewTabKey', 'Show links \u2192 open in new tab']].map(([k, label]) => {
+          const c = this.keyCapture(s[k], v => {
+            if (!v) return;
+            s[k] = v;
+            SK.store.save('settings');
+          });
+          c.style.minHeight = '44px';
+          return h('div', { class: 'sk-row', style: { flexDirection: 'column', alignItems: 'stretch' } }, h('div', { class: 'name' }, label), c);
+        }),
         h(
           'div',
           { class: 'sk-row' },
-          h('div', { class: 'grow' }, h('div', { class: 'name' }, 'Browser-wide hotkeys'), h('div', { class: 'meta' }, SK.MODE === 'bookmarklet' ? 'Click your Secret Keys bookmark to show / hide the panel' : 'Alt+K palette · Alt+Shift+K panel — change at chrome://extensions/shortcuts'))
+          h('div', { class: 'grow' }, h('div', { class: 'name' }, 'Browser-wide hotkeys'), h('div', { class: 'meta' }, SK.MODE === 'bookmarklet' ? 'Click your Secret Keys bookmark to show / hide the panel' : 'Alt+K palette \u00b7 Alt+Shift+K panel \u2014 change at chrome://extensions/shortcuts'))
         ),
         h('div', { class: 'sk-row' }, h('div', { class: 'grow' }, h('div', { class: 'name' }, 'Run JavaScript'), jsStatus))
       )
@@ -1813,7 +1986,7 @@ globalThis.SK.MODE = 'bookmarklet';
       if (listening) return;
       listening = true;
       el.classList.add('listening');
-      el.replaceChildren(h('span', null, opts.clearable ? 'Press keys… (Esc cancel · ⌫ remove)' : 'Press keys… (Esc to cancel)'));
+      el.replaceChildren(h('span', null, opts.clearable ? 'Press keys\u2026 (Esc cancel \u00b7 \u232b remove)' : 'Press keys\u2026 (Esc to cancel)'));
       addEventListener('keydown', handler, true);
     });
     show();
@@ -1824,9 +1997,11 @@ globalThis.SK.MODE = 'bookmarklet';
     if (!c || !c.key) return [];
     const host = location.hostname;
     const out = [];
-    for (const b of SK.store.data.bindings) if (b.id !== exceptId && b.domain === host && SK.combo.same(b, c)) out.push(`shortcut “${b.name}”`);
-    for (const m of SK.store.data.macros) if (m.id !== exceptId && (m.global || m.domain === host) && SK.combo.same(m, c)) out.push(`macro “${m.name}”`);
-    if (SK.combo.same(SK.store.data.settings.paletteKey, c)) out.push('the command palette');
+    for (const b of SK.store.data.bindings) if (b.id !== exceptId && b.domain === host && SK.combo.same(b, c)) out.push(`shortcut \u201c${b.name}\u201d`);
+    for (const m of SK.store.data.macros) if (m.id !== exceptId && (m.global || m.domain === host) && SK.combo.same(m, c)) out.push(`macro \u201c${m.name}\u201d`);
+    const st = SK.store.data.settings;
+    if (SK.combo.same(st.paletteKey, c)) out.push('the command palette');
+    if (SK.combo.same(st.hintKey, c) || SK.combo.same(st.hintNewTabKey, c)) out.push('\u201cshow all buttons & links\u201d');
     return out;
   };
 
@@ -1862,7 +2037,7 @@ globalThis.SK.MODE = 'bookmarklet';
       SK.store.save('bindings');
       m.close();
       this.renderView();
-      this.toast(`${SK.combo.format(combo)} → ${data.name}`);
+      this.toast(`${SK.combo.format(combo)} \u2192 ${data.name}`);
     };
 
     const m = this.modal(
@@ -1882,7 +2057,7 @@ globalThis.SK.MODE = 'bookmarklet';
   ui.openMacroEditor = function (existing, template) {
     const base = existing || template || {};
     let combo = base.key ? { key: base.key, ctrl: !!base.ctrl, alt: !!base.alt, shift: !!base.shift, meta: !!base.meta } : null;
-    const name = h('input', { class: 'sk-input', value: base.name || '', placeholder: 'e.g. Quick reply, Open dashboard…' });
+    const name = h('input', { class: 'sk-input', value: base.name || '', placeholder: 'e.g. Quick reply, Open dashboard\u2026' });
     const warn = warnBox();
     const cap = this.keyCapture(
       combo,
@@ -1944,7 +2119,7 @@ globalThis.SK.MODE = 'bookmarklet';
                   );
                 }
               },
-              '🎯 Pick'
+              '\ud83c\udfaf Pick'
             );
             ctl = h('div', { class: 'sk-inline' }, input, pickBtn);
           }
@@ -1984,7 +2159,7 @@ globalThis.SK.MODE = 'bookmarklet';
       SK.store.save('macros');
       m.close();
       this.renderView();
-      this.toast(combo ? `Saved — press ${SK.combo.format(combo)}` : `Saved — run it from the palette (${SK.combo.format(SK.store.data.settings.paletteKey)})`, { accent: 'macro' });
+      this.toast(combo ? `Saved \u2014 press ${SK.combo.format(combo)}` : `Saved \u2014 run it from the palette (${SK.combo.format(SK.store.data.settings.paletteKey)})`, { accent: 'macro' });
     };
 
     m = this.modal([
@@ -2000,7 +2175,7 @@ globalThis.SK.MODE = 'bookmarklet';
         'div',
         { class: 'sk-btns' },
         h('button', { class: 'sk-btn', onclick: () => m.close() }, 'Cancel'),
-        h('button', { class: 'sk-btn', title: 'Try it without saving', onclick: () => SK.runMacro(collect(), { target: this.lastEditable }) }, '▶ Test'),
+        h('button', { class: 'sk-btn', title: 'Try it without saving', onclick: () => SK.runMacro(collect(), { target: this.lastEditable }) }, '\u25b6 Test'),
         h('button', { class: 'sk-btn macro', onclick: save }, 'Save')
       )
     ]);
@@ -2012,7 +2187,7 @@ globalThis.SK.MODE = 'bookmarklet';
     if (this.picking) return;
     this.picking = true;
     this.panel.classList.add('picking');
-    const tip = this.toast('Click any element to select it · Esc to cancel', { duration: 10 * 60 * 1000 });
+    const tip = this.toast('Click any element to select it \u00b7 Esc to cancel', { duration: 10 * 60 * 1000 });
     const realTarget = e => {
       const p = e.composedPath();
       return p.includes(this.host) ? null : SK.pickable(p[0]);
@@ -2062,9 +2237,9 @@ globalThis.SK.MODE = 'bookmarklet';
   ui.buildBadge = function () {
     this.badge = h(
       'div',
-      { class: 'sk-badge glass', title: 'Secret Keys — click to open, drag to move' },
+      { class: 'sk-badge glass', title: 'Secret Keys \u2014 click to open, drag to move' },
       h('div', { class: 'sk-sheen' }),
-      h('span', { class: 'dot' }, '⌘'),
+      h('span', { class: 'dot' }, '\u2318'),
       h('span', null, 'Keys')
     );
     this.root.append(this.badge);
@@ -2123,9 +2298,10 @@ globalThis.SK.MODE = 'bookmarklet';
       'div',
       { class: `sk-toast glass ${o.type || ''} ${o.accent || ''}` },
       h('div', { class: 'sk-sheen' }),
-      h('span', { class: 'bolt' }, o.type === 'error' ? '⚠' : '⚡'),
+      h('span', { class: 'bolt' }, o.type === 'error' ? '\u26a0' : '\u26a1'),
       h('span', null, msg)
     );
+    const textEl = el.lastChild;
     let timer;
     const dismiss = () => {
       clearTimeout(timer);
@@ -2148,7 +2324,7 @@ globalThis.SK.MODE = 'bookmarklet';
     this.toasts.append(el);
     while (this.toasts.children.length > 4) this.toasts.firstChild.remove();
     timer = setTimeout(dismiss, o.duration || 2200);
-    return { dismiss };
+    return { dismiss, set: t => (textEl.textContent = t) };
   };
 
   // ---------- backup ----------
@@ -2184,7 +2360,7 @@ globalThis.SK.MODE = 'bookmarklet';
 
 
 // ===== content/palette.js =====
-// Secret Keys v10 — command palette (Alt+K anywhere, or Ctrl/Cmd+K in the page)
+// Secret Keys v10 \u2014 command palette (Alt+K anywhere, or Ctrl/Cmd+K in the page)
 (() => {
   'use strict';
   const SK = globalThis.SK;
@@ -2216,14 +2392,14 @@ globalThis.SK.MODE = 'bookmarklet';
   };
 
   const TAB_CMDS = [
-    ['new', '🆕', 'New tab'],
-    ['duplicate', '📑', 'Duplicate tab'],
-    ['pin', '📌', 'Pin / unpin tab'],
-    ['mute', '🔇', 'Mute / unmute tab'],
-    ['dedupe', '🧹', 'Close duplicate tabs'],
-    ['bookmark', '⭐', 'Bookmark this page'],
-    ['reload', '🔄', 'Reload page'],
-    ['close', '✖️', 'Close tab']
+    ['new', '\ud83c\udd95', 'New tab'],
+    ['duplicate', '\ud83d\udcd1', 'Duplicate tab'],
+    ['pin', '\ud83d\udccc', 'Pin / unpin tab'],
+    ['mute', '\ud83d\udd07', 'Mute / unmute tab'],
+    ['dedupe', '\ud83e\uddf9', 'Close duplicate tabs'],
+    ['bookmark', '\u2b50', 'Bookmark this page'],
+    ['reload', '\ud83d\udd04', 'Reload page'],
+    ['close', '\u2716\ufe0f', 'Close tab']
   ];
 
   const P = (SK.palette = { m: null });
@@ -2239,12 +2415,12 @@ globalThis.SK.MODE = 'bookmarklet';
     const here = location.hostname;
 
     const commands = () => [
-      { icon: '🎛️', title: ui.isOpen ? 'Hide panel' : 'Show panel', sub: 'Secret Keys', run: () => ui.toggle() },
-      { icon: '🎯', title: 'Pick element & bind a key', sub: 'Secret Keys', run: () => ui.startPicking() },
-      { icon: '⚡', title: 'New macro', sub: 'Secret Keys', run: () => ui.openMacroEditor() },
-      { icon: '🎨', title: 'Customize look & feel', sub: 'Secret Keys', run: () => ui.open('style') },
+      { icon: '\ud83c\udf9b\ufe0f', title: ui.isOpen ? 'Hide panel' : 'Show panel', sub: 'Secret Keys', run: () => ui.toggle() },
+      { icon: '\ud83c\udfaf', title: 'Pick element & bind a key', sub: 'Secret Keys', run: () => ui.startPicking() },
+      { icon: '\u26a1', title: 'New macro', sub: 'Secret Keys', run: () => ui.openMacroEditor() },
+      { icon: '\ud83c\udfa8', title: 'Customize look & feel', sub: 'Secret Keys', run: () => ui.open('style') },
       {
-        icon: s.enabled ? '⏸️' : '▶️',
+        icon: s.enabled ? '\u23f8\ufe0f' : '\u25b6\ufe0f',
         title: s.enabled ? 'Pause all hotkeys' : 'Resume all hotkeys',
         sub: 'Secret Keys',
         run: () => {
@@ -2254,10 +2430,25 @@ globalThis.SK.MODE = 'bookmarklet';
           ui.toast(s.enabled ? 'Hotkeys on' : 'Hotkeys paused');
         }
       },
-      { icon: '🔗', title: 'Copy page as Markdown link', sub: 'Page', run: async () => (await SK.copy(`[${document.title}](${location.href})`), ui.toast('Copied')) },
-      { icon: '📋', title: 'Copy page URL', sub: 'Page', run: async () => (await SK.copy(location.href), ui.toast('Copied')) },
-      { icon: '⬆️', title: 'Scroll to top', sub: 'Page', run: () => scrollTo({ top: 0, behavior: 'smooth' }) },
-      { icon: '⬇️', title: 'Scroll to bottom', sub: 'Page', run: () => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }) },
+      { icon: '\ud83d\udc41\ufe0f', title: 'Show all buttons & links on screen', sub: `Page \u00b7 ${SK.combo.format(s.hintKey)}`, run: () => SK.hints.start() },
+      { icon: '\u2197\ufe0f', title: 'Show links to open in a new tab', sub: `Page \u00b7 ${SK.combo.format(s.hintNewTabKey)}`, run: () => SK.hints.start({ newTab: true }) },
+      { icon: '\ud83d\udd0d', title: 'Find hidden links (opens every menu)', sub: 'Page', run: () => SK.explore.confirmAndRun() },
+      { icon: '\ud83d\udc7b', title: 'Show hidden links on this page', sub: 'Page', run: () => ((ui.pageFilter = 'hidden'), ui.open('page'), ui.renderView()) },
+      { icon: '\ud83d\udcc3', title: 'List every link & button on this page', sub: 'Page', run: () => ui.open('page') },
+      {
+        icon: '\ud83d\udcda',
+        title: 'Copy all links on this page',
+        sub: 'Page',
+        run: async () => {
+          const links = SK.allLinks();
+          await SK.copy(links.join('\n'));
+          ui.toast(`Copied ${links.length} links (including hidden)`);
+        }
+      },
+      { icon: '\ud83d\udd17', title: 'Copy page as Markdown link', sub: 'Page', run: async () => (await SK.copy(`[${document.title}](${location.href})`), ui.toast('Copied')) },
+      { icon: '\ud83d\udccb', title: 'Copy page URL', sub: 'Page', run: async () => (await SK.copy(location.href), ui.toast('Copied')) },
+      { icon: '\u2b06\ufe0f', title: 'Scroll to top', sub: 'Page', run: () => scrollTo({ top: 0, behavior: 'smooth' }) },
+      { icon: '\u2b07\ufe0f', title: 'Scroll to bottom', sub: 'Page', run: () => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }) },
       ...TAB_CMDS.filter(([a]) => SK.MODE !== 'bookmarklet' || ['new', 'duplicate', 'reload'].includes(a)).map(([action, icon, title]) => ({
         icon,
         title,
@@ -2271,21 +2462,21 @@ globalThis.SK.MODE = 'bookmarklet';
           }
         }
       })),
-      { icon: '💾', title: 'Export backup', sub: 'Data', run: () => ui.exportData() },
-      { icon: '📥', title: 'Import backup', sub: 'Data', run: () => ui.importData() }
+      { icon: '\ud83d\udcbe', title: 'Export backup', sub: 'Data', run: () => ui.exportData() },
+      { icon: '\ud83d\udce5', title: 'Import backup', sub: 'Data', run: () => ui.importData() }
     ];
 
     const macroItems = SK.store.data.macros
       .filter(m => m.enabled && (m.global || m.domain === here))
       .map(m => {
         const def = SK.ACTIONS[m.actionType] || {};
-        return { icon: def.icon || '⚡', title: m.name, sub: def.label, kbd: m.key ? m : null, macro: true, run: () => SK.runMacro(m, ctx) };
+        return { icon: def.icon || '\u26a1', title: m.name, sub: def.label, kbd: m.key ? m : null, macro: true, run: () => SK.runMacro(m, ctx) };
       });
 
     const bindingItems = SK.store.data.bindings
       .filter(b => b.enabled && b.domain === here)
       .map(b => ({
-        icon: '⌨️',
+        icon: '\u2328\ufe0f',
         title: b.name,
         sub: 'Click on page',
         kbd: b,
@@ -2301,10 +2492,10 @@ globalThis.SK.MODE = 'bookmarklet';
     let activeIdx = 0;
     let rows = [];
 
-    const input = h('input', { class: 'sk-pal-input', placeholder: 'Search macros, shortcuts, tabs, bookmarks…', spellcheck: false });
+    const input = h('input', { class: 'sk-pal-input', placeholder: 'Search macros, shortcuts, tabs, bookmarks\u2026', spellcheck: false });
     const list = h('div', { class: 'sk-pal-list' });
     const tip = (k, t) => h('span', null, h('b', null, k), ' ', t);
-    const foot = h('div', { class: 'sk-pal-foot' }, tip('↑↓', 'move'), tip('↵', 'run'), tip('>', 'commands'), tip('!', 'macros'), tip('@', 'tabs'), tip('*', 'bookmarks'), tip('Esc', 'close'));
+    const foot = h('div', { class: 'sk-pal-foot' }, tip('\u2191\u2193', 'move'), tip('\u21b5', 'run'), tip('>', 'commands'), tip('!', 'macros'), tip('@', 'tabs'), tip('*', 'bookmarks'), tip('Esc', 'close'));
 
     const paint = () => {
       rows.forEach((r, i) => r.classList.toggle('active', i === activeIdx));
@@ -2354,8 +2545,8 @@ globalThis.SK.MODE = 'bookmarklet';
           'Web',
           [
             looksUrl
-              ? { icon: '🌐', title: `Open ${raw}`, sub: 'New tab', run: () => SK.bg({ type: 'openUrl', url: /^https?:/i.test(raw) ? raw : 'https://' + raw, newTab: true }) }
-              : { icon: '🔎', title: `Search the web for “${raw}”`, sub: 'Google', run: () => SK.bg({ type: 'openUrl', url: 'https://www.google.com/search?q=' + encodeURIComponent(raw), newTab: true }) }
+              ? { icon: '\ud83c\udf10', title: `Open ${raw}`, sub: 'New tab', run: () => SK.bg({ type: 'openUrl', url: /^https?:/i.test(raw) ? raw : 'https://' + raw, newTab: true }) }
+              : { icon: '\ud83d\udd0e', title: `Search the web for \u201c${raw}\u201d`, sub: 'Google', run: () => SK.bg({ type: 'openUrl', url: 'https://www.google.com/search?q=' + encodeURIComponent(raw), newTab: true }) }
           ]
         ]);
       }
@@ -2390,7 +2581,7 @@ globalThis.SK.MODE = 'bookmarklet';
           nodes.push(row);
         }
       }
-      list.replaceChildren(...(nodes.length ? nodes : [h('div', { class: 'sk-empty' }, h('b', null, '🤷'), 'Nothing matches')]));
+      list.replaceChildren(...(nodes.length ? nodes : [h('div', { class: 'sk-empty' }, h('b', null, '\ud83e\udd37'), 'Nothing matches')]));
       paint();
     };
 
@@ -2399,7 +2590,7 @@ globalThis.SK.MODE = 'bookmarklet';
       if (!(mode === '*' || raw.length >= 2) || (mode && mode !== '*')) return;
       SK.bg({ type: 'searchBookmarks', query: raw })
         .then(bs => {
-          bookmarkItems = bs.map(b => ({ icon: '⭐', title: b.title || b.url, sub: host(b.url), run: () => SK.bg({ type: 'openUrl', url: b.url, newTab: true }) }));
+          bookmarkItems = bs.map(b => ({ icon: '\u2b50', title: b.title || b.url, sub: host(b.url), run: () => SK.bg({ type: 'openUrl', url: b.url, newTab: true }) }));
           if (this.m) render(true);
         })
         .catch(() => {});
@@ -2428,7 +2619,7 @@ globalThis.SK.MODE = 'bookmarklet';
       }
     });
 
-    this.m = ui.modal([h('div', { class: 'sk-pal-head' }, h('span', { class: 'glyph' }, '⌘'), input), list, foot], {
+    this.m = ui.modal([h('div', { class: 'sk-pal-head' }, h('span', { class: 'glyph' }, '\u2318'), input), list, foot], {
       top: true,
       cls: 'sk-pal',
       onClose: () => (this.m = null)
@@ -2440,7 +2631,7 @@ globalThis.SK.MODE = 'bookmarklet';
       .then(tabs => {
         tabItems = tabs
           .filter(t => !t.active)
-          .map(t => ({ icon: '🗂️', title: t.title || t.url, sub: host(t.url), run: () => SK.bg({ type: 'switchTab', id: t.id, windowId: t.windowId }) }));
+          .map(t => ({ icon: '\ud83d\uddc2\ufe0f', title: t.title || t.url, sub: host(t.url), run: () => SK.bg({ type: 'switchTab', id: t.id, windowId: t.windowId }) }));
         if (this.m) render(true);
       })
       .catch(() => {});
@@ -2448,11 +2639,451 @@ globalThis.SK.MODE = 'bookmarklet';
 })();
 
 
-// ===== content/main.js =====
-// Secret Keys v10 — hotkey engine + startup
+// ===== content/hints.js =====
+// Secret Keys \u2014 "show everything": letter tags on every button / link / field you can see
 (() => {
   'use strict';
   const SK = globalThis.SK;
+  const h = SK.h;
+  const ALPHA = 'asdfghjklqwertyuiopzxcvbnm';
+
+  SK.kindOf = el => (el.matches('a[href]') ? 'link' : SK.isEditable(el) ? 'input' : 'button');
+  SK.KIND_ICON = { link: '\ud83d\udd17', button: '\ud83d\udd18', input: '\u270f\ufe0f' };
+
+  // All clickable things on the page (outermost only, so a button inside a link isn't counted twice)
+  SK.pageItems = ({ viewportOnly = false, limit = 1500 } = {}) => {
+    const out = [];
+    const seen = new Set();
+    for (const el of document.querySelectorAll(SK.INTERACTIVE)) {
+      if (out.length >= limit) break;
+      if (el.closest('#secret-keys-host')) continue;
+      const parent = el.parentElement && el.parentElement.closest(SK.INTERACTIVE);
+      if (parent && seen.has(parent)) continue;
+      if (!SK.visible(el)) continue;
+      if (viewportOnly) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < 0 || r.right < 0 || r.top > innerHeight || r.left > innerWidth) continue;
+      }
+      seen.add(el);
+      out.push(el);
+    }
+    return out;
+  };
+
+  SK.hints = {
+    active: false,
+    _stop: null,
+
+    toggle(opts) {
+      this.active ? this.stop() : this.start(opts);
+    },
+
+    start({ newTab = false } = {}) {
+      if (this.active) return;
+      const ui = SK.ui;
+      const els = SK.pageItems({ viewportOnly: true, limit: 676 });
+      if (!els.length) return ui.toast('No buttons or links on screen', { type: 'error' });
+
+      const two = els.length > ALPHA.length;
+      const items = [];
+      const layer = h('div', { class: 'sk-hints' });
+      els.forEach((el, i) => {
+        const label = two ? ALPHA[Math.floor(i / 26)] + ALPHA[i % 26] : ALPHA[i];
+        const r = el.getBoundingClientRect();
+        const kind = SK.kindOf(el);
+        const chip = h('span', {
+          class: 'sk-tag ' + kind,
+          title: SK.labelOf(el),
+          style: { left: Math.max(2, r.left) + 'px', top: Math.max(2, r.top) + 'px', animationDelay: Math.min(i * 4, 200) + 'ms' },
+          onpointerdown: e => {
+            e.preventDefault();
+            e.stopPropagation();
+            finish(items[i], e.shiftKey);
+          }
+        }, label.toUpperCase());
+        layer.append(chip);
+        items.push({ el, label, chip, kind });
+      });
+
+      const ui_wasOpen = ui.isOpen;
+      if (ui_wasOpen) ui.panel.classList.add('picking');
+      ui.root.append(layer);
+      ui.modals++;
+      this.active = true;
+      const tip = ui.toast(`${els.length} on screen \u00b7 type the letters${newTab ? ' \u00b7 links open in a new tab' : ' \u00b7 Shift = new tab'} \u00b7 Esc to close`, { duration: 10 * 60 * 1000 });
+      let typed = '';
+
+      const paint = () => {
+        for (const it of items) {
+          const ok = it.label.startsWith(typed);
+          it.chip.hidden = !ok;
+          it.chip.replaceChildren(h('b', null, it.label.slice(0, typed.length).toUpperCase()), it.label.slice(typed.length).toUpperCase());
+        }
+      };
+
+      const finish = (it, shift) => {
+        this.stop();
+        const el = it.el;
+        SK.ui.flash(el);
+        if ((newTab || shift) && el.href) {
+          SK.bg({ type: 'openUrl', url: el.href, newTab: true }).catch(() => window.open(el.href, '_blank', 'noopener'));
+        } else if (it.kind === 'input') {
+          el.focus();
+        } else {
+          el.click();
+        }
+      };
+
+      const onKey = e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (SK.MOD_KEYS.includes(e.key)) return;
+        if (e.key === 'Escape') return this.stop();
+        if (e.key === 'Backspace') {
+          typed = typed.slice(0, -1);
+          return paint();
+        }
+        const k = SK.combo.keyOf(e);
+        if (k.length !== 1 || !ALPHA.includes(k)) return;
+        const next = typed + k;
+        const matches = items.filter(it => it.label.startsWith(next));
+        if (!matches.length) return;
+        typed = next;
+        if (matches.length === 1 && matches[0].label === typed) return finish(matches[0], e.shiftKey);
+        paint();
+      };
+      const cancel = () => this.stop();
+      const onPointer = e => {
+        if (!e.composedPath().includes(ui.host)) this.stop();
+      };
+
+      addEventListener('keydown', onKey, true);
+      addEventListener('scroll', cancel, true);
+      addEventListener('resize', cancel);
+      addEventListener('pointerdown', onPointer, true);
+
+      this._stop = () => {
+        removeEventListener('keydown', onKey, true);
+        removeEventListener('scroll', cancel, true);
+        removeEventListener('resize', cancel);
+        removeEventListener('pointerdown', onPointer, true);
+        layer.classList.add('out');
+        setTimeout(() => layer.remove(), 160);
+        tip.dismiss();
+        ui.panel.classList.remove('picking');
+        ui.modals--;
+        this.active = false;
+      };
+    },
+
+    stop() {
+      const s = this._stop;
+      this._stop = null;
+      if (s) s();
+    }
+  };
+})();
+
+
+// ===== content/explore.js =====
+// Secret Keys \u2014 find links you can't see: hidden menus, links that appear after a click, widgets, frames, page code
+(() => {
+  'use strict';
+  const SK = globalThis.SK;
+  const h = SK.h;
+
+  const okUrl = u => !!u && !/^(javascript|data|blob):/i.test(u);
+  const resolve = u => {
+    try {
+      return new URL(u, location.href).href;
+    } catch {
+      return '';
+    }
+  };
+  const short = t => (t || '').replace(/\s+/g, ' ').trim().slice(0, 40);
+
+  // Every document we can read: the page, open shadow roots (widgets), same-site iframes
+  SK.allRoots = () => {
+    const roots = [];
+    const walk = (root, kind) => {
+      roots.push({ root, kind });
+      let n = 0;
+      for (const el of root.querySelectorAll('*')) {
+        if (++n > 20000) break;
+        if (el.shadowRoot && el.id !== 'secret-keys-host') walk(el.shadowRoot, 'widget');
+      }
+    };
+    walk(document, 'page');
+    for (const f of document.querySelectorAll('iframe')) {
+      try {
+        if (f.contentDocument && f.contentDocument.documentElement) walk(f.contentDocument, 'frame');
+      } catch {}
+    }
+    return roots;
+  };
+
+  // ---------- Link catcher: remembers every link that shows up while you browse ----------
+  SK.catcher = {
+    map: new Map(), // url -> { url, label, source, trigger, triggerSel, time }
+    lastClick: null,
+
+    add(a, extra = {}) {
+      const url = a.href && String(a.href);
+      if (!okUrl(url) || this.map.size > 3000) return;
+      const prev = this.map.get(url);
+      if (prev) {
+        if (!prev.trigger && extra.trigger) Object.assign(prev, extra);
+        return;
+      }
+      this.map.set(url, { url, label: SK.labelOf(a), time: Date.now(), source: 'appeared', ...extra });
+    },
+
+    start() {
+      // remember what you clicked, so we can say "appeared after clicking X"
+      document.addEventListener(
+        'click',
+        e => {
+          const p = e.composedPath();
+          if (p.includes(SK.ui.host)) return;
+          const t = SK.pickable(p[0]);
+          if (t) this.lastClick = { el: t, label: short(SK.labelOf(t)), sel: SK.selectorFor(t), time: Date.now() };
+        },
+        true
+      );
+      let pending = [];
+      let timer = null;
+      const flush = () => {
+        timer = null;
+        const nodes = pending;
+        pending = [];
+        const lc = this.lastClick && Date.now() - this.lastClick.time < 2500 ? this.lastClick : null;
+        const extra = SK.explore.current || (lc ? { trigger: lc.label, triggerSel: lc.sel } : {});
+        for (const n of nodes) {
+          if (!n.isConnected || n.closest('#secret-keys-host')) continue;
+          if (n.matches('a[href]')) this.add(n, extra);
+          for (const a of n.querySelectorAll('a[href]')) this.add(a, extra);
+        }
+      };
+      new MutationObserver(muts => {
+        for (const m of muts) for (const n of m.addedNodes) if (n.nodeType === 1) pending.push(n);
+        if (pending.length && !timer) timer = setTimeout(flush, 250);
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    }
+  };
+
+  // ---------- Links you can't see right now ----------
+  SK.hiddenLinks = visibleUrls => {
+    const out = new Map();
+    const add = (url, entry) => {
+      if (!okUrl(url) || visibleUrls.has(url) || out.has(url)) return;
+      out.set(url, { kind: 'link', hidden: true, url, ...entry });
+    };
+
+    for (const { root, kind } of SK.allRoots()) {
+      for (const a of root.querySelectorAll('a[href]')) {
+        if (a.closest && a.closest('#secret-keys-host')) continue;
+        const caught = SK.catcher.map.get(a.href);
+        const vis = SK.visible(a);
+        if (kind === 'page' && vis) continue;
+        add(a.href, {
+          el: a,
+          label: SK.labelOf(a),
+          source: kind === 'page' ? (caught && caught.trigger ? 'menu' : 'hidden') : kind,
+          trigger: caught && caught.trigger,
+          triggerSel: caught && caught.triggerSel
+        });
+      }
+    }
+
+    // links that only live in code: data-href, data-url, onclick="location=\u2026"
+    for (const el of document.querySelectorAll('[data-href],[data-url],[data-link],[onclick*="location"],[onclick*="open("],[onclick*="href"]')) {
+      if (el.closest('#secret-keys-host')) continue;
+      let raw = el.getAttribute('data-href') || el.getAttribute('data-url') || el.getAttribute('data-link');
+      if (!raw) {
+        const m = (el.getAttribute('onclick') || '').match(/['"`]((?:https?:\/\/|\/)[^'"`\s]+)['"`]/);
+        raw = m && m[1];
+      }
+      if (raw) add(resolve(raw), { el, label: SK.labelOf(el), source: 'code' });
+    }
+
+    // links that appeared earlier and are gone now
+    for (const c of SK.catcher.map.values()) {
+      if (!out.has(c.url) && !visibleUrls.has(c.url)) add(c.url, { label: c.label, source: c.trigger ? 'menu' : 'gone', trigger: c.trigger, triggerSel: c.triggerSel });
+    }
+    return [...out.values()];
+  };
+
+  SK.SOURCE_TEXT = {
+    hidden: () => 'Hidden on the page',
+    menu: e => `Inside \u201c${e.trigger}\u201d`,
+    gone: () => 'Appeared earlier',
+    widget: () => 'Inside a widget',
+    frame: () => 'Inside a frame',
+    code: () => 'In page code'
+  };
+
+  // Every link URL we know about: visible, hidden, caught, in code
+  SK.allLinks = () => {
+    const urls = new Set();
+    for (const { root } of SK.allRoots()) for (const a of root.querySelectorAll('a[href]')) if (okUrl(a.href) && !(a.closest && a.closest('#secret-keys-host'))) urls.add(a.href);
+    for (const e of SK.hiddenLinks(new Set())) urls.add(e.url);
+    return [...urls];
+  };
+
+  // ---------- Reveal: open the menu a hidden link lives in, then flash it ----------
+  const findLink = url => {
+    for (const a of document.querySelectorAll('a[href]')) if (a.href === url && SK.visible(a)) return a;
+    return null;
+  };
+  const triggerFor = el => {
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      if (n.tagName === 'DETAILS') return n.querySelector(':scope > summary');
+      if (n.id) {
+        const t = document.querySelector(`[aria-controls~="${CSS.escape(n.id)}"], [data-target="#${CSS.escape(n.id)}"], [data-bs-target="#${CSS.escape(n.id)}"], [href="#${CSS.escape(n.id)}"]`);
+        if (t) return t;
+      }
+      const prev = n.previousElementSibling;
+      if (prev && prev.matches('[aria-haspopup]:not([aria-haspopup="false"]), [aria-expanded], .dropdown-toggle')) return prev;
+    }
+    return null;
+  };
+
+  SK.reveal = async entry => {
+    const ui = SK.ui;
+    const show = el => {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      setTimeout(() => {
+        ui.flash(el);
+        ui.highlight(el, entry.label);
+        setTimeout(() => ui.highlight(null), 1500);
+      }, 350);
+    };
+    let el = findLink(entry.url);
+    if (el) return show(el);
+    let trig = null;
+    if (entry.el && entry.el.isConnected) trig = triggerFor(entry.el);
+    if (!trig && entry.triggerSel) try { trig = document.querySelector(entry.triggerSel); } catch {}
+    if (trig) {
+      if (trig.tagName === 'SUMMARY') trig.parentElement.open = true;
+      else trig.click();
+      await SK.sleep(400);
+      el = findLink(entry.url);
+      if (el) return show(el);
+    }
+    ui.toast("Can't show it on the page \u2014 but you can open or copy it", { type: 'error', duration: 3500 });
+  };
+
+  // ---------- Explorer: open each menu / dropdown / tab / section and record the links inside ----------
+  const TRIGGERS = [
+    'summary',
+    '[aria-haspopup]:not([aria-haspopup="false"])',
+    '[aria-expanded="false"]',
+    '[data-toggle="dropdown"]', '[data-bs-toggle="dropdown"]', '[data-toggle="collapse"]', '[data-bs-toggle="collapse"]',
+    '.dropdown-toggle', '.menu-toggle', '.navbar-toggler',
+    '[role="tab"]:not([aria-selected="true"])'
+  ].join(',');
+  const DANGER = /delete|remove|logout|log out|sign out|unsubscribe|cancel|pay|buy|purchase|checkout|order|submit|send|post|publish|confirm|block|report|close account/i;
+
+  SK.explore = {
+    current: null,
+    running: false,
+
+    findTriggers() {
+      const out = [];
+      for (const el of document.querySelectorAll(TRIGGERS)) {
+        if (out.length >= 60) break;
+        if (el.closest('#secret-keys-host') || !SK.visible(el)) continue;
+        if (el.matches('a[href]') && !/^#|^javascript:/i.test(el.getAttribute('href') || '')) continue; // would navigate away
+        if (el.matches('[type=submit], input[type=image]') || el.closest('form') && el.matches('button:not([type=button])')) continue;
+        if (DANGER.test(SK.labelOf(el))) continue;
+        out.push(el);
+      }
+      return out;
+    },
+
+    async run() {
+      if (this.running) return;
+      const ui = SK.ui;
+      const triggers = this.findTriggers();
+      if (!triggers.length) return ui.toast('No menus or dropdowns found on this page');
+      this.running = true;
+      const startY = scrollY;
+      const before = SK.catcher.map.size;
+      const selectedTabs = [...document.querySelectorAll('[role="tab"][aria-selected="true"]')];
+      const tip = ui.toast(`Opening menus\u2026 0 / ${triggers.length}`, { duration: 120000, accent: 'macro' });
+      let i = 0;
+      for (const t of triggers) {
+        i++;
+        tip.set(`Opening menus\u2026 ${i} / ${triggers.length}`);
+        if (!t.isConnected || !SK.visible(t)) continue;
+        const name = short(SK.labelOf(t));
+        this.current = { trigger: name, triggerSel: SK.selectorFor(t) };
+        const wasExpanded = t.getAttribute('aria-expanded');
+        try {
+          if (t.tagName === 'SUMMARY') {
+            const d = t.parentElement;
+            const was = d.open;
+            d.open = true;
+            await SK.sleep(200);
+            for (const a of d.querySelectorAll('a[href]')) SK.catcher.add(a, this.current);
+            d.open = was;
+          } else {
+            const visBefore = new Set([...document.querySelectorAll('a[href]')].filter(SK.visible));
+            for (const type of ['pointerover', 'mouseover', 'pointerenter', 'mouseenter']) t.dispatchEvent(new MouseEvent(type, { bubbles: type.endsWith('over') }));
+            t.click();
+            await SK.sleep(450);
+            for (const a of document.querySelectorAll('a[href]')) if (!visBefore.has(a) && SK.visible(a) && !a.closest('#secret-keys-host')) SK.catcher.add(a, this.current);
+            // close it again
+            if (t.isConnected && t.getAttribute('aria-expanded') === 'true' && wasExpanded !== 'true') t.click();
+            else if (!t.matches('[role="tab"]')) document.activeElement && document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }));
+            for (const type of ['pointerout', 'mouseout', 'pointerleave', 'mouseleave']) t.dispatchEvent(new MouseEvent(type, { bubbles: type.endsWith('out') }));
+            await SK.sleep(150);
+          }
+        } catch {}
+      }
+      for (const tab of selectedTabs) if (tab.isConnected) try { tab.click(); } catch {}
+      await SK.sleep(300); // let the catcher finish
+      this.current = null;
+      this.running = false;
+      scrollTo({ top: startY });
+      tip.dismiss();
+      const found = SK.catcher.map.size - before;
+      ui.pageFilter = 'hidden';
+      ui.open('page');
+      ui.renderView();
+      ui.toast(found ? `Found ${found} new link${found === 1 ? '' : 's'} inside menus` : 'Checked every menu \u2014 no new links', { accent: 'macro', duration: 3500 });
+    },
+
+    confirmAndRun() {
+      const ui = SK.ui;
+      const n = this.findTriggers().length;
+      if (!n) return ui.toast('No menus or dropdowns found on this page');
+      let m;
+      m = ui.modal([
+        h('h3', null, '\ud83d\udd0d Find hidden links', h('small', null, location.hostname)),
+        h('div', { class: 'sk-hint', style: { fontSize: '.92em', lineHeight: '1.5' } },
+          `Secret Keys will open ${n} menu${n === 1 ? '' : 's'}, dropdown${n === 1 ? '' : 's'} and tab${n === 1 ? '' : 's'} on this page one by one, write down the links inside, and close them again. It takes a few seconds.`),
+        h('div', { class: 'sk-card' },
+          h('div', { class: 'sk-row' }, h('span', null, '\u2705'), h('div', { class: 'grow meta', style: { whiteSpace: 'normal' } }, 'Only presses menu-style buttons')),
+          h('div', { class: 'sk-row' }, h('span', null, '\ud83d\udeab'), h('div', { class: 'grow meta', style: { whiteSpace: 'normal' } }, 'Never clicks real links, submits forms, or presses buttons like Delete, Buy, Send or Log out'))),
+        h('div', { class: 'sk-btns' },
+          h('button', { class: 'sk-btn', onclick: () => m.close() }, 'Cancel'),
+          h('button', { class: 'sk-btn macro', onclick: () => (m.close(), ui.close(), setTimeout(() => this.run(), 200)) }, 'Start'))
+      ]);
+    }
+  };
+})();
+
+
+// ===== content/main.js =====
+// Secret Keys v10 \u2014 hotkey engine + startup
+(() => {
+  'use strict';
+  const SK = globalThis.SK;
+  // Only one copy may run per page: the newest one to start wins, older copies retire.
+  const OWNER = SK.uid();
+  const isOwner = () => document.documentElement.dataset.skOwner === OWNER;
+  document.documentElement.dataset.skOwner = OWNER;
 
   SK.engine = {
     start() {
@@ -2464,7 +3095,7 @@ globalThis.SK.MODE = 'bookmarklet';
     },
 
     onKey(e) {
-      if (!SK.alive()) return this.stop(); // extension was reloaded; this old copy retires
+      if (!SK.alive() || !isOwner()) return this.stop(); // extension was reloaded / a newer copy took over
       if (e.isComposing || SK.ui.busy || SK.ui.picking || SK.MOD_KEYS.includes(e.key)) return;
       const s = SK.store.data.settings;
 
@@ -2476,6 +3107,14 @@ globalThis.SK.MODE = 'bookmarklet';
       }
       if (!s.enabled) return;
       if (e.composedPath().includes(SK.ui.host)) return; // typing inside our own UI
+
+      const hintNew = SK.combo.matches(s.hintNewTabKey, e);
+      if (hintNew || SK.combo.matches(s.hintKey, e)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (!e.repeat) SK.hints.start({ newTab: hintNew });
+        return;
+      }
 
       const active = SK.deepActive();
       const hasMod = e.ctrlKey || e.altKey || e.metaKey;
@@ -2505,30 +3144,32 @@ globalThis.SK.MODE = 'bookmarklet';
 
   (async () => {
     if (window.top !== window) return;
-    document.querySelectorAll('#secret-keys-host').forEach(n => n.remove()); // old copy after an update
     try {
       await SK.store.load();
     } catch (e) {
       console.warn('[Secret Keys] could not load storage', e);
       return;
     }
+    if (!isOwner()) return; // a newer copy started while we were loading
+    document.querySelectorAll('#secret-keys-host').forEach(n => n.remove()); // old copy after an update
     const migrated = await SK.store.migrateV9();
     SK.ui.mount();
     SK.engine.start();
+    SK.catcher.start();
     SK.store.on(changed => SK.ui.onData(changed));
     chrome.runtime.onMessage.addListener(msg => {
       if (msg.type === 'togglePanel') SK.ui.toggle();
       else if (msg.type === 'openPalette') SK.palette.toggle();
     });
 
-    if (migrated) SK.ui.toast(`Moved ${migrated} item${migrated > 1 ? 's' : ''} over from v9 ✨`, { duration: 4500 });
+    if (migrated) SK.ui.toast(`Moved ${migrated} item${migrated > 1 ? 's' : ''} over from v9 \u2728`, { duration: 4500 });
     const { welcomed } = await chrome.storage.local.get('welcomed');
     if (!welcomed) {
       chrome.storage.local.set({ welcomed: true });
-      SK.ui.toast(`Secret Keys is ready — press ${SK.MODE === 'bookmarklet' ? SK.combo.format(SK.store.data.settings.paletteKey) : 'Alt+K'} for the command palette`, { duration: 6000 });
+      SK.ui.toast(`Secret Keys is ready \u2014 press ${SK.MODE === 'bookmarklet' ? SK.combo.format(SK.store.data.settings.paletteKey) : 'Alt+K'} for the command palette`, { duration: 6000 });
     }
-    if (SK.MODE === 'bookmarklet') SK.ui.open(); // you clicked the bookmark — show it
-    console.log('%c⌘ Secret Keys v10', 'color:#0A84FF;font-weight:800', '— made by VEDANT');
+    if (SK.MODE === 'bookmarklet') SK.ui.open(); // you clicked the bookmark \u2014 show it
+    console.log('%c\u2318 Secret Keys v10', 'color:#0A84FF;font-weight:800', '\u2014 made by VEDANT');
   })();
 })();
 

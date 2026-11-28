@@ -68,6 +68,21 @@
           ui.toast(s.enabled ? 'Hotkeys on' : 'Hotkeys paused');
         }
       },
+      { icon: '👁️', title: 'Show all buttons & links on screen', sub: `Page · ${SK.combo.format(s.hintKey)}`, run: () => SK.hints.start() },
+      { icon: '↗️', title: 'Show links to open in a new tab', sub: `Page · ${SK.combo.format(s.hintNewTabKey)}`, run: () => SK.hints.start({ newTab: true }) },
+      { icon: '🔍', title: 'Find hidden links (opens every menu)', sub: 'Page', run: () => SK.explore.confirmAndRun() },
+      { icon: '👻', title: 'Show hidden links on this page', sub: 'Page', run: () => ((ui.pageFilter = 'hidden'), ui.open('page'), ui.renderView()) },
+      { icon: '📃', title: 'List every link & button on this page', sub: 'Page', run: () => ui.open('page') },
+      {
+        icon: '📚',
+        title: 'Copy all links on this page',
+        sub: 'Page',
+        run: async () => {
+          const links = SK.allLinks();
+          await SK.copy(links.join('\n'));
+          ui.toast(`Copied ${links.length} links (including hidden)`);
+        }
+      },
       { icon: '🔗', title: 'Copy page as Markdown link', sub: 'Page', run: async () => (await SK.copy(`[${document.title}](${location.href})`), ui.toast('Copied')) },
       { icon: '📋', title: 'Copy page URL', sub: 'Page', run: async () => (await SK.copy(location.href), ui.toast('Copied')) },
       { icon: '⬆️', title: 'Scroll to top', sub: 'Page', run: () => scrollTo({ top: 0, behavior: 'smooth' }) },

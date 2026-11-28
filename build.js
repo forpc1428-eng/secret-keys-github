@@ -18,6 +18,9 @@ for (const f of files) {
 }
 out += `\nwindow.__SK_BM__ = () => globalThis.SK.ui && globalThis.SK.ui.toggle();\n})();\n`;
 
+// Escape every non-ASCII character (emoji, symbols) so the file works on sites with any text encoding
+out = out.replace(/[\u0080-\uffff]/g, c => '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0'));
+
 fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
 fs.writeFileSync(path.join(root, 'docs/secret-keys.js'), out);
 console.log(`Built docs/secret-keys.js (${(out.length / 1024).toFixed(1)} KB) from ${files.length} files`);

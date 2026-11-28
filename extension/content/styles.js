@@ -188,6 +188,37 @@
   background: radial-gradient(circle at 70% 70%, var(--sk-text) 1.2px, transparent 1.6px), radial-gradient(circle at 30% 70%, var(--sk-text) 1.2px, transparent 1.6px), radial-gradient(circle at 70% 30%, var(--sk-text) 1.2px, transparent 1.6px); }
 .dock-left .sk-resize, .dock-right .sk-resize { display: none; }
 
+/* ---------- Page tab ---------- */
+.sk-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+.sk-filter { border: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; font-weight: 600; font-size: .88em; background: var(--sk-fill); color: var(--sk-sub); transition: transform .2s ${EASE}, background .15s; }
+.sk-filter span { font-size: .85em; padding: 0 6px; border-radius: 10px; background: var(--sk-fill2); }
+.sk-filter.active { background: var(--sk-accent); color: #fff; text-shadow: none; }
+.sk-filter.active span { background: rgba(255,255,255,.25); }
+.sk-filter:active { transform: scale(.94); }
+.sk-kind { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: 13px; flex-shrink: 0; text-shadow: none; background: var(--sk-fill); }
+.sk-kind.link { background: color-mix(in srgb, var(--sk-accent) 22%, transparent); }
+.sk-kind.button { background: color-mix(in srgb, var(--sk-macro) 22%, transparent); }
+.sk-kind.input { background: rgba(48,209,88,.2); }
+.sk-kind.ghost { background: transparent; outline: 1.5px dashed color-mix(in srgb, var(--sk-accent) 60%, transparent); outline-offset: -1.5px; }
+.sk-filter.ghost:not(.active) { outline: 1px dashed var(--sk-line); outline-offset: -1px; }
+.sk-src { display: inline-block; margin-right: 6px; padding: 0 6px; border-radius: 6px; font-weight: 600; color: var(--sk-macro); background: color-mix(in srgb, var(--sk-macro) 16%, transparent); }
+
+/* ---------- Hint tags (show all buttons & links) ---------- */
+.sk-hints { position: fixed; inset: 0; z-index: 2147483646; pointer-events: none; }
+.sk-hints.out { transition: opacity .15s; opacity: 0; }
+.sk-tag { position: fixed; pointer-events: auto; cursor: pointer; transform: translate(-6px, -8px);
+  font: 800 11.5px/1.25 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .05em; padding: 3px 7px; border-radius: 8px;
+  color: #fff; text-shadow: 0 1px 1px rgba(0,0,0,.35);
+  background: var(--hc); backdrop-filter: blur(8px) saturate(180%); -webkit-backdrop-filter: blur(8px) saturate(180%);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.5), 0 0 0 .5px rgba(255,255,255,.45);
+  animation: sk-hint-in .32s ${EASE} both; }
+.sk-tag:hover { filter: brightness(1.15); z-index: 1; }
+.sk-tag b { opacity: .4; font-weight: 800; }
+.sk-tag.link { --hc: color-mix(in srgb, var(--sk-accent) 88%, transparent); }
+.sk-tag.button { --hc: color-mix(in srgb, var(--sk-macro) 90%, transparent); }
+.sk-tag.input { --hc: rgba(40,190,80,.9); }
+@keyframes sk-hint-in { from { opacity: 0; transform: translate(-6px, -8px) scale(.4); } }
+
 /* ---------- Floating pill ---------- */
 .sk-badge { position: fixed; z-index: 2147483645; display: flex; align-items: center; gap: 8px; padding: 9px 14px 9px 10px; border-radius: 999px !important; cursor: pointer; user-select: none; touch-action: none; font-weight: 700; font-size: .92em;
   transition: transform .35s ${EASE}, opacity .3s; }

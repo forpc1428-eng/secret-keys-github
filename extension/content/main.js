@@ -2,6 +2,10 @@
 (() => {
   'use strict';
   const SK = globalThis.SK;
+  // Only one copy may run per page: the newest one to start wins, older copies retire.
+  const OWNER = SK.uid();
+  const isOwner = () => document.documentElement.dataset.skOwner === OWNER;
+  document.documentElement.dataset.skOwner = OWNER;
 
   SK.engine = {
     start() {
@@ -13,7 +17,7 @@
     },
 
     onKey(e) {
-      if (!SK.alive()) return this.stop(); // extension was reloaded; this old copy retires
+      if (!SK.alive() || !isOwner()) return this.stop(); // extension was reloaded / a newer copy took over
       if (e.isComposing || SK.ui.busy || SK.ui.picking || SK.MOD_KEYS.includes(e.key)) return;
       const s = SK.store.data.settings;
 
@@ -25,6 +29,14 @@
       }
       if (!s.enabled) return;
       if (e.composedPath().includes(SK.ui.host)) return; // typing inside our own UI
+
+      const hintNew = SK.combo.matches(s.hintNewTabKey, e);
+      if (hintNew || SK.combo.matches(s.hintKey, e)) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (!e.repeat) SK.hints.start({ newTab: hintNew });
+        return;
+      }
 
       const active = SK.deepActive();
       const hasMod = e.ctrlKey || e.altKey || e.metaKey;
@@ -54,16 +66,18 @@
 
   (async () => {
     if (window.top !== window) return;
-    document.querySelectorAll('#secret-keys-host').forEach(n => n.remove()); // old copy after an update
     try {
       await SK.store.load();
     } catch (e) {
       console.warn('[Secret Keys] could not load storage', e);
       return;
     }
+    if (!isOwner()) return; // a newer copy started while we were loading
+    document.querySelectorAll('#secret-keys-host').forEach(n => n.remove()); // old copy after an update
     const migrated = await SK.store.migrateV9();
     SK.ui.mount();
     SK.engine.start();
+    SK.catcher.start();
     SK.store.on(changed => SK.ui.onData(changed));
     chrome.runtime.onMessage.addListener(msg => {
       if (msg.type === 'togglePanel') SK.ui.toggle();

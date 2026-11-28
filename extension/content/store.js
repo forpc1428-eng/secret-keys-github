@@ -15,6 +15,8 @@
     enabled: true,
     ignoreInInputs: true,
     paletteKey: { key: 'k', ctrl: !SK.isMac, meta: SK.isMac, alt: false, shift: false },
+    hintKey: { key: 'j', alt: true, ctrl: false, meta: false, shift: false },
+    hintNewTabKey: { key: 'j', alt: true, shift: true, ctrl: false, meta: false },
     theme: {
       preset: 'ios',
       ...SK.PRESETS.ios,

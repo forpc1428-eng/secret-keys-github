@@ -123,7 +123,7 @@
   };
 
   SK.labelOf = el => {
-    const raw = el.getAttribute('aria-label') || el.innerText || el.title || el.value || el.getAttribute('alt') || el.placeholder || el.getAttribute('name') || '';
+    const raw = el.getAttribute('aria-label') || el.innerText || el.textContent || el.title || el.value || el.getAttribute('alt') || el.placeholder || el.getAttribute('name') || '';
     const t = String(raw).replace(/\s+/g, ' ').trim();
     return (t || `<${el.tagName.toLowerCase()}>`).slice(0, 48);
   };
